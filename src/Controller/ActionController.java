@@ -1,0 +1,476 @@
+package Controller;
+
+
+
+
+import java.util.ArrayList;
+import java.util.Random;
+
+
+import javax.swing.JOptionPane;
+
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import UI.Bridges;
+import UI.ExitDialog;
+import UI.NewPuzzle;
+import UI.NoGame;
+import Modell.CalculateGrid;
+import Modell.CheckInput;
+
+import Modell.GridPainter;
+import Modell.Island;
+
+import SaveLoad.*;
+
+/**
+ * Die `ActionController`-Klasse ist die Hauptklasse für die Steuerung der Anwendung,
+ * die die Benutzeroberfläche und Spiellogik verknüpft.
+ */
+public class ActionController {
+	// Felder zur Speicherung der Hauptkomponenten der Anwendung
+	private Bridges bridges;         // Das Hauptfenster der Anwendung
+	private ExitDialog exitGame;     // Ein Dialogfenster zum Beenden des Spiels
+	private NewPuzzle puzzle;        // Ein Dialogfenster zur Puzzle-Erstellung
+	private NoGame saveInfo;         // Ein Dialogfenster für fehlende Spielinformationen
+	private SaveGame save;           // Eine Klasse zur Speicherung von Spielständen
+	private LoadGame load;           // Eine Klasse zur Verwaltung des Ladens von Spielständen
+
+	// Felder zur Verwaltung von Spielinformationen und Zuständen
+	private int height;              // Die Höhe des Spielfelds
+	private int width;               // Die Breite des Spielfelds
+	private int islands;             // Die Anzahl der Inseln auf dem Spielfeld
+	private CheckInput checkInput;   // Ein Objekt zur Überprüfung von Benutzereingaben
+
+	// Felder zur Darstellung des Spielfelds und der Inseln
+	private GridPainter grid;       // Das Spielfeld, auf dem das Puzzle gezeichnet wird
+	private Island island;           // Eine einzelne Insel im Puzzle
+	private CalculateGrid gridValues; // Eine Klasse zur Berechnung von Gitterwerten
+
+	// Konstanten für die minimale und maximale Spielfeldgröße
+	private final int minValue = 4;
+	private final int maxValue = 25;
+
+	// Zufallszahlengenerator für die Erstellung von zufälligen Puzzle-Größen
+	private Random randomSize = new Random();
+
+	// Fehlermeldung für ungültige Eingaben
+	private String nan = "Sie müssen eine Zahl zwischen: " + minValue + " und " + maxValue + " eingeben!";
+
+	// Eine Liste von Inseln im aktuellen Puzzle
+	private ArrayList<Island> listofIslands = new ArrayList<Island>();
+
+	// Der BridgeController zur Verwaltung der Brücken
+	private BridgeController bridgeC;
+
+	// Ein Flag, das angibt, ob der BridgeController bereits erstellt wurde
+	private boolean controllerExist = false;
+	
+    
+    private static final int DEFAULT_CENTER_X = 0;
+    private static final int DEFAULT_CENTER_Y = 0;
+    
+    
+    /**
+     * Konstruktor für den ActionController. Initialisiert die Dialogfenster und fügt Listener hinzu.
+     *
+     * @param bridges Die Hauptanwendung (Bridges), zu der dieser Controller gehört.
+     */
+    public ActionController(Bridges bridges) {
+        this.bridges = bridges;
+        exitGame = new ExitDialog();
+        puzzle = new NewPuzzle();
+        checkInput = new CheckInput();
+        bridgeC = new BridgeController();
+        save = new SaveGame();
+        saveInfo = new NoGame();
+        addListener();
+    }
+	
+	
+	
+	/**
+	 * Fügt ActionListeners zu verschiedenen UI-Elementen hinzu.
+	 */
+	public void addListener() {
+	    // Menüaktionen
+	    bridges.getMiNewPuzzle().addActionListener(e -> PuzzleView()); // Öffnet ein neues Rätselansichtsfenster
+	    bridges.getMiQuit().addActionListener(e -> ExitView()); // Öffnet ein Bestätigungsdialogfenster zum Beenden
+	    bridges.getMiSavePuzzle().addActionListener(e -> SaveGame()); // Speichert das aktuelle Spiel
+	    bridges.getMiLoadPuzzle().addActionListener(e -> loadGame()); // Lädt ein gespeichertes Spiel
+
+	    // Dialog für Spielinformationen
+	    saveInfo.getBtnOK().addActionListener(e -> DisposeView()); // Schließt das Dialogfenster für Spielinformationen
+
+	    // Dialog für Spiel beenden
+	    exitGame.getBtnExit().addActionListener(e -> ExitGame()); // Beendet das Spiel
+	    exitGame.getBtnNo().addActionListener(e -> DisposeView()); // Schließt das Bestätigungsdialogfenster
+
+	    // Puzzle-Einstellungen
+	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die automatische Größenanpassung
+	    puzzle.getRbnSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die manuelle Größeneinstellung
+	    puzzle.getCbDefineIslands().addActionListener(e -> ToggleIslands()); // Aktiviert die Einstellung der Inselanzahl
+	    puzzle.getBtnOk().addActionListener(e -> CheckInput()); // Überprüft die Benutzereingabe
+	    puzzle.getBtnAbord().addActionListener(e -> DisposeView()); // Schließt das Einstellungsfenster
+	}
+	
+	/**
+	 * Lädt ein gespeichertes Spiel und initialisiert die erforderlichen Komponenten.
+	 */
+	private void loadGame() {
+	    // Laden der Spielinformationen aus der LoadGame-Klasse
+	    load = new LoadGame();
+	    
+	    // Berechnung der Gitterwerte basierend auf den Spielinformationen
+	    gridValues = new CalculateGrid(bridges.getDraw().getWidth(), bridges.getDraw().getHeight(), load.getWidth(), load.getHeight());
+
+	    // Erstellen einer Liste von Inseln durch Verarbeitung der Informationen aus der Datei
+	    ArrayList<Island> islandsA = new ArrayList<Island>();
+	    for (int[] islandInfo : load.getIslandsList()) {
+	        int x = islandInfo[0];
+	        int y = islandInfo[1];
+	        int bridge = islandInfo[2];
+	        
+	        // Eine Insel erstellen und zur Liste hinzufügen
+	        Island islands = new Island(x, y, islandsA.size() + 1, bridge);
+	        islandsA.add(islands);
+	    }
+
+	    // Erstellen des Rasters mit den geladenen Informationen
+	    grid = new GridPainter(load.getWidth(), load.getHeight(), gridValues.getXDistance(), gridValues.getYDistance(),  islandsA);
+
+	    // Entfernen der alten Zeichenfläche und Hinzufügen des neuen Rasters
+	    bridges.getDraw().removeAll();
+	    bridges.getDraw().add(grid, BorderLayout.CENTER);
+
+	    // Aktualisieren der Oberfläche
+	    bridges.getDraw().revalidate();
+	    bridges.getDraw().repaint();
+	    grid.revalidate();
+	    grid.repaint();
+	}
+	
+	/**
+	 * Speichert das aktuelle Spiel, sofern es vorhanden ist, oder zeigt eine Fehlermeldung an.
+	 */
+	private void SaveGame() {
+	    if (island == null) {
+	        // Wenn keine Inseln vorhanden sind, wird ein Fehlerdialog angezeigt.
+	        saveInfo.setVisible(true);
+	    } else {
+	        // Speichert das Spiel mit den aktuellen Parametern und der Liste der Inseln.
+	        save.saveGame(getWidth(), getHeight(), getIslands(), island.getListofIslands());
+	    }
+	}
+
+	/**
+	 * Zeigt das Exit-Dialogfenster an, um das Spiel zu beenden.
+	 */
+	private void ExitView() {
+	    exitGame.setVisible(true);
+	}
+
+	/**
+	 * Zeigt das Puzzle-Dialogfenster an, um Einstellungen für ein neues Rätsel vorzunehmen.
+	 */
+	private void PuzzleView() {
+	    puzzle.setVisible(true);
+	    //listofIslands.clear(); // Diese Zeile ist auskommentiert. Falls notwendig, kann sie verwendet werden.
+	}
+
+	/**
+	 * Beendet das Spiel und schließt die Anwendung.
+	 */
+	private void ExitGame() {
+	    System.exit(0);
+	}
+
+	/**
+	 * Schließt das sichtbare Dialogfenster, falls eines davon sichtbar ist.
+	 * Überprüft, ob das Exit-Dialogfenster, das Puzzle-Dialogfenster oder das Spielinfo-Dialogfenster sichtbar ist,
+	 * und schließt es entsprechend.
+	 */
+	private void DisposeView() {
+	    if (exitGame.isVisible()) {
+	        exitGame.dispose(); // Schließt das Exit-Dialogfenster
+	    }
+	    if (puzzle.isVisible()) {
+	        puzzle.dispose(); // Schließt das Puzzle-Dialogfenster
+	    }
+	    if (saveInfo.isVisible()) {
+	        saveInfo.dispose(); // Schließt das Spielinfo-Dialogfenster
+	    }
+	}
+	
+	/**
+	 * Aktiviert/Deaktiviert die Eingabefelder und Optionen basierend auf der ausgewählten Größenoption.
+	 */
+	private void Toggle() {
+	    if (puzzle.getRbnAutoSizeIsland().isSelected()) {
+	        // Automatische Größe ausgewählt
+	        puzzle.getRbnSizeIsland().setSelected(false);
+	        puzzle.getRbnSizeIsland().setEnabled(true);
+	        puzzle.getTfHeight().setEnabled(false);
+	        puzzle.getTfWidth().setEnabled(false);
+	        puzzle.getCbDefineIslands().setEnabled(false);
+	        puzzle.getTfIslands().setEnabled(false);
+	    } 
+	    if (puzzle.getRbnSizeIsland().isSelected()) {
+	        // Manuelle Größe ausgewählt
+	        puzzle.getRbnAutoSizeIsland().setSelected(false);
+	        puzzle.getTfHeight().setEnabled(true);
+	        puzzle.getTfWidth().setEnabled(true);
+	        puzzle.getCbDefineIslands().setEnabled(true);
+	        if (puzzle.getCbDefineIslands().isSelected()) {
+	            puzzle.getTfIslands().setEnabled(true);
+	        }
+	    }
+	}
+
+	/**
+	 * Aktiviert/Deaktiviert das Eingabefeld für die Anzahl der Inseln basierend auf der Auswahl.
+	 */
+	private void ToggleIslands() {
+	    if (puzzle.getCbDefineIslands().isSelected()) {
+	        // Wenn "Inselzahl festlegen" ausgewählt ist
+	        puzzle.getTfIslands().setEnabled(true);
+	    } else {
+	        // Wenn "Inselzahl festlegen" nicht ausgewählt ist
+	        puzzle.getTfIslands().setEnabled(false);
+	    }
+	}
+	
+	/**
+	 * Überprüft die Benutzereingaben und erstellt ein neues Rätsel basierend auf den Eingaben.
+	 */
+	private void CheckInput() {
+	    // Create a random puzzle game
+	    if (puzzle.getRbnAutoSizeIsland().isSelected()) {
+	        int minSize = 4;
+	        int maxSize = 25;
+	        int minIslands = 2;
+	       
+
+	        // Zufällige Werte für Breite, Höhe und Inseln generieren
+	        height = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
+	        width = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
+	        int maxIslands = (int) (0.2 * width * height);
+	        islands = randomSize.nextInt((maxIslands - minIslands) + 1) + minIslands;
+
+	        // Werte setzen und neues Rätsel erstellen
+	        setWidth(width);
+	        setHeight(height);
+	        setIslands(islands);
+
+	        createBoard(width, height, islands);
+	        return;
+	    }
+
+	    try {
+	        // Benutzereingaben für Höhe und Breite abrufen
+	        height = Integer.parseInt(puzzle.getTfHeight().getText());
+	        width = Integer.parseInt(puzzle.getTfWidth().getText());
+
+	        // Benutzereingaben auf Gültigkeit prüfen
+	        if (!checkInput.checkUserWH(width, height)) {
+	            return;
+	        }
+
+	        // Wenn die Inselanzahl festgelegt ist
+	        if (puzzle.getCbDefineIslands().isSelected()) {
+	            islands = Integer.parseInt(puzzle.getTfIslands().getText());
+
+	            // Prüfen, ob die Anzahl der Inseln gültig ist
+	            if (!checkInput.checkUserIslands(width, height, islands)) {
+	                return;
+	            }
+	        } else {
+	            int maxRandomIslands = (int) (0.2 * width * height);
+	            int minRandomIslands = 2;
+
+	            // Zufällige Anzahl von Inseln zwischen 2 und maxRandomIslands generieren
+	            islands = randomSize.nextInt((maxRandomIslands - minRandomIslands) + 1) + minRandomIslands;
+	        }
+
+	        // Dialog schließen und neues Rätsel erstellen
+	        puzzle.dispose();
+	        setWidth(width);
+	        setHeight(height);
+	        setIslands(islands);
+	        createBoard(width, height, islands);
+	        
+	    } catch (NumberFormatException nfe) {
+	        // Fehlermeldung bei ungültigen Eingaben anzeigen
+	        JOptionPane.showMessageDialog(null, nan, "Fehlerhafte Eingabe", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
+	
+	/**
+	 * Erstellt ein neues Spielbrett mit den angegebenen Dimensionen und Inseln.
+	 * @param width Die Breite des Spielbretts.
+	 * @param height Die Höhe des Spielbretts.
+	 * @param islands Die Anzahl der Inseln auf dem Spielbrett.
+	 */
+	private void createBoard(int width, int height, int islands) {
+	    // Die Liste der Inseln löschen, um Platz für die neuen Inseln zu schaffen
+	    listofIslands.clear();
+	    
+	    // Die Gitterwerte für die Berechnung festlegen
+	    gridValues = new CalculateGrid(bridges.getDraw().getWidth(), bridges.getDraw().getHeight(), width, height);
+
+	    // Ein neues Insel-Objekt erstellen
+	    island = new Island(width, height, -1, listofIslands, 0, false, false, false, false,DEFAULT_CENTER_X,DEFAULT_CENTER_Y);
+
+	    // Die erste Insel erstellen
+	    island.createFirstIsland(islands);
+
+	    // Solange die Insel noch nicht korrekt ist, weiter Inseln erstellen
+	    do {
+	        System.out.println("Creating new island...\n");
+	        
+	        island.createFirstIsland(islands);
+	    } while (!island.isOk());
+
+	
+	    // Ein neues Gitter-Objekt erstellen
+	   grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), island.getListofIslands());
+
+	    
+	    // Das Puzzle-Fenster schließen
+	    puzzle.dispose();
+
+	    
+	    clearAndAddGrid();
+	    /*
+	    // Das Gitter zur Anzeige hinzufügen
+	    bridges.getDraw().removeAll();
+	    bridges.getDraw().add(grid, BorderLayout.CENTER);
+
+	    // Die Anzeige aktualisieren
+	    bridges.getDraw().revalidate();
+	    bridges.getDraw().repaint();
+	    //grid.revalidate();
+	   // grid.repaint();*/
+	    
+	    //BridgeController bridgeC = new BridgeController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance());
+	    //bridgeC.initController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance());
+	    /*bridges.getDraw().addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseClicked(MouseEvent e) {
+	            // Rufen Sie den Controller auf und übergeben Sie die Mausklick-Koordinaten
+	            int x = e.getX();
+	            int y = e.getY();
+	            bridgeC.handleMouseClick(x, y); // Annahme, dass "controller" Ihr Controller-Objekt ist
+	        }
+	    });*/
+	    int delta = 0;
+	    if(gridValues.getXDistance() < gridValues.getYDistance())
+	    	delta = gridValues.getXDistance();
+	    else
+	    	delta = gridValues.getYDistance();
+	    
+	    bridgeC.initController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height);
+	    if(!controllerExist) {
+	    	registerMouseListener();
+	    }
+	    
+	}
+	
+	/**
+	 * Entfernt alle Komponenten aus der Zeichenfläche und fügt das Gitter hinzu.
+	 * Aktualisiert dann die Anzeige, um die Änderungen sichtbar zu machen.
+	 */
+	private void clearAndAddGrid() {
+	    // Entferne alle vorhandenen Komponenten aus der Zeichenfläche
+	    bridges.getDraw().removeAll();
+
+	    // Füge das Gitter zur Zeichenfläche in der Mitte (BorderLayout.CENTER) hinzu
+	    bridges.getDraw().add(grid, BorderLayout.CENTER);
+
+	    // Aktualisiere die Anzeige, um die Änderungen sichtbar zu machen
+	    bridges.getDraw().revalidate();
+	    bridges.getDraw().repaint();
+	}
+	
+	
+	
+	/**
+	 * Registriert einen MouseListener für die Zeichenfläche, um Mausklicks zu verarbeiten.
+	 */
+	private void registerMouseListener() {
+		controllerExist = true;
+
+	    // Fügen Sie einen MouseAdapter zur Zeichenfläche hinzu, um Mausklicks zu verarbeiten
+	    bridges.getDraw().addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseClicked(MouseEvent e) {
+	            // Koordinaten des Mausklicks abrufen
+	            int x = e.getX();
+	            int y = e.getY();
+
+	            // Den BridgeController aufrufen und die Mausklick-Koordinaten übergeben
+	            bridgeC.handleMouseClick(x, y);
+	        }
+	    });
+	}
+	
+	/**
+	 * Gibt die Höhe des Spielfelds zurück.
+	 *
+	 * @return Die Höhe des Spielfelds.
+	 */
+	public int getHeight() {
+	    return height;
+	}
+
+	/**
+	 * Legt die Höhe des Spielfelds fest.
+	 *
+	 * @param height Die zu setzende Höhe des Spielfelds.
+	 */
+	public void setHeight(int height) {
+	    this.height = height;
+	}
+
+	/**
+	 * Gibt die Breite des Spielfelds zurück.
+	 *
+	 * @return Die Breite des Spielfelds.
+	 */
+	public int getWidth() {
+	    return width;
+	}
+
+	/**
+	 * Legt die Breite des Spielfelds fest.
+	 *
+	 * @param width Die zu setzende Breite des Spielfelds.
+	 */
+	public void setWidth(int width) {
+	    this.width = width;
+	}
+
+	/**
+	 * Gibt die Anzahl der Inseln auf dem Spielfeld zurück.
+	 *
+	 * @return Die Anzahl der Inseln.
+	 */
+	public int getIslands() {
+	    return islands;
+	}
+
+	/**
+	 * Legt die Anzahl der Inseln auf dem Spielfeld fest.
+	 *
+	 * @param islands Die zu setzende Anzahl der Inseln.
+	 */
+	public void setIslands(int islands) {
+	    this.islands = islands;
+	}
+}
+
+
+
