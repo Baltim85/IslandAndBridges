@@ -1,16 +1,13 @@
 package UI;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.SwingConstants;
-import java.awt.Window.Type;
-import java.awt.Dialog.ModalityType;
-import java.awt.Dialog.ModalExclusionType;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
 import java.awt.Font;
@@ -30,9 +27,6 @@ public class NoGame extends JDialog {
 
 	// Eindeutige Serial-Version-ID zur Serialisierung der Klasse.
 	private static final long serialVersionUID = 1L;
-
-	// Das Haupt-JPanel, das alle UI-Komponenten enthält.
-	private final JPanel contentPanel = new JPanel();
 
 	// Schaltfläche zum Bestätigen (OK) des Dialogs.
 	private JButton btnOK;

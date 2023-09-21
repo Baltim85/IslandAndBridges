@@ -27,50 +27,50 @@ public class ExitDialog extends JDialog{
 	// Beschriftungen für Aufmerksamkeit und Anfrage.
 	private JLabel lblAttention, lblRequest;
 
-	
-	
-    /**
-     * Erstellt einen neuen ExitDialog.
-     */
-    public ExitDialog() {
-        // Dialog-Größe und Layout festlegen
-        setBounds(100, 100, 358, 170);
-        getContentPane().setLayout(new BorderLayout());
-        
-        // Panel für den Inhalt erstellen und hinzufügen
-        JPanel contentPanel = new JPanel();
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
-        contentPanel.setLayout(null);
-        
-        // "Nein"-Button erstellen und positionieren
-        btnNo = new JButton("Nein");
-        btnNo.setBounds(10, 93, 144, 23);
-        
-        // "Beenden"-Button erstellen und positionieren
-        btnExit = new JButton("Beenden");
-        btnExit.setBounds(188, 93, 144, 23);
-        
-        // Hinweislabel erstellen und positionieren
-        lblAttention = new JLabel("Achtung! Nicht gespeicherter Fortschritt geht verloren!");
-        lblAttention.setBounds(10, 23, 332, 23);
-        
-        // Anforderungslabel erstellen und positionieren
-        lblRequest = new JLabel("Möchten Sie das Spiel wirklich Beenden?");
-        lblRequest.setBounds(10, 59, 332, 23);
-        
-        // Komponenten zum Panel hinzufügen
-        contentPanel.add(lblAttention);
-        contentPanel.add(lblRequest);
-        contentPanel.add(btnNo);
-        contentPanel.add(btnExit);
 
-        // Dialog modal machen (blockiert andere Interaktionen)
-        setModal(true);
 
-        // Standard-Aktion beim Schließen des Dialogs festlegen
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    }
+	/**
+	 * Erstellt einen neuen ExitDialog.
+	 */
+	public ExitDialog() {
+		// Dialog-Größe und Layout festlegen
+		setBounds(100, 100, 358, 170);
+		getContentPane().setLayout(new BorderLayout());
+
+		// Panel für den Inhalt erstellen und hinzufügen
+		JPanel contentPanel = new JPanel();
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(null);
+
+		// "Nein"-Button erstellen und positionieren
+		btnNo = new JButton("Nein");
+		btnNo.setBounds(10, 93, 144, 23);
+
+		// "Beenden"-Button erstellen und positionieren
+		btnExit = new JButton("Beenden");
+		btnExit.setBounds(188, 93, 144, 23);
+
+		// Hinweislabel erstellen und positionieren
+		lblAttention = new JLabel("Achtung! Nicht gespeicherter Fortschritt geht verloren!");
+		lblAttention.setBounds(10, 23, 332, 23);
+
+		// Anforderungslabel erstellen und positionieren
+		lblRequest = new JLabel("Möchten Sie das Spiel wirklich Beenden?");
+		lblRequest.setBounds(10, 59, 332, 23);
+
+		// Komponenten zum Panel hinzufügen
+		contentPanel.add(lblAttention);
+		contentPanel.add(lblRequest);
+		contentPanel.add(btnNo);
+		contentPanel.add(btnExit);
+
+		// Dialog modal machen (blockiert andere Interaktionen)
+		setModal(true);
+
+		// Standard-Aktion beim Schließen des Dialogs festlegen
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	}
 
 
 
@@ -80,7 +80,7 @@ public class ExitDialog extends JDialog{
 	 * @return der "Nein"-Button
 	 */
 	public JButton getBtnNo() {
-	    return btnNo;
+		return btnNo;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ExitDialog extends JDialog{
 	 * @param btnNo der zu setzende "Nein"-Button
 	 */
 	public void setBtnNo(JButton btnNo) {
-	    this.btnNo = btnNo;
+		this.btnNo = btnNo;
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class ExitDialog extends JDialog{
 	 * @return der "Exit"-Button
 	 */
 	public JButton getBtnExit() {
-	    return btnExit;
+		return btnExit;
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class ExitDialog extends JDialog{
 	 * @param btnExit der zu setzende "Exit"-Button
 	 */
 	public void setBtnExit(JButton btnExit) {
-	    this.btnExit = btnExit;
+		this.btnExit = btnExit;
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class ExitDialog extends JDialog{
 	 * @return die Serial Version UID
 	 */
 	public static long getSerialversionuid() {
-	    return serialVersionUID;
+		return serialVersionUID;
 	}
 
 	/**
@@ -125,8 +125,8 @@ public class ExitDialog extends JDialog{
 	 * @return das Inhalts-Panel
 	 */
 	public JPanel getContentPanel() {
-	    return contentPanel;
+		return contentPanel;
 	}
-	
+
 
 }
