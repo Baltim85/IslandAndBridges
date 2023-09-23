@@ -160,7 +160,7 @@ public class Island {
 	private void createNorthIsland(Island chosenIsland) {
 		int bridgeCount = 1+(random.nextInt(2));
 
-		int newPosY = possibleValuesNW(chosenIsland, y, chosenIsland.getY());
+		int newPosY = possibleValuesNW(chosenIsland, y, chosenIsland.getY(), Directions.NORTH);
 
 		if(newPosY <= 1 || !checkForAnotherIsland(chosenIsland, newPosY, Directions.NORTH) ||
 				!checkDirectedNeighboursWE(chosenIsland, newPosY, Directions.NORTH)) {
@@ -256,10 +256,13 @@ public class Island {
 				!checkDirectedNeighboursWE(chosenIsland, newPosY, Directions.SOUTH)) {
 			chosenIsland.setSouth(false);
 		} else {
+			if(newPosY < chosenIsland.getY())
+				newPosY += chosenIsland.getY();
 			if(!listOfBridges.isEmpty()) {
 				int chosenX = chosenIsland.getX();
 				int chosenY = chosenIsland.getY();
-				for(int i = chosenIsland.getY(); i < newPosY+1; i++ ) {
+				
+				for(int i = chosenIsland.getY(); i < newPosY; i++ ) {
 					
 					for (CreateBridges bridge : listOfBridges) {
 						int firstX = bridge.getFirstIslandX();
@@ -346,9 +349,14 @@ public class Island {
 			chosenIsland.setEast(false);
 
 		} else {
+			if(newPosX < chosenIsland.getX())
+				newPosX += chosenIsland.getX();
+			//newPosX +=chosenIsland.getX();
 			if(!listOfBridges.isEmpty()) {
+				
 				int chosenX = chosenIsland.getX();
 				int chosenY = chosenIsland.getY();
+				
 				for(int i = chosenIsland.getX(); i < newPosX+1; i++ ) {
 					
 					for (CreateBridges bridge : listOfBridges) {
@@ -491,7 +499,7 @@ public class Island {
 
 	private void createWestIsland(Island chosenIsland) {
 		int bridgeCount = 1+(random.nextInt(2));
-		int newPosX = possibleValuesNW(chosenIsland, x, chosenIsland.getX());
+		int newPosX = possibleValuesNW(chosenIsland, x, chosenIsland.getX(), Directions.WEST);
 
 		
 		if(newPosX <= 1 || !checkForAnotherIsland(chosenIsland, newPosX, Directions.WEST) ||
@@ -875,14 +883,14 @@ public class Island {
 	        if (possibleValues == 0) {
 	        	if(direction == Directions.SOUTH && (2+ islandXY) > getY() )
 	        		return possibleValues = 0;
-	        	if(direction == Directions.EAST && (2+ islandXY) > getY()) 
+	        	if(direction == Directions.EAST && (2+ islandXY) > getX()) 
 	        		return possibleValues = 0;
 	        	else
 	        		return possibleValues = 2 + islandXY;
 	            //return possibleValues;
 	        }
 	    }
-	    possibleValues += 1 + islandXY;
+	    //possibleValues += 1 + islandXY;
 	    return possibleValues;
 	}
 
@@ -901,14 +909,18 @@ public class Island {
 	 * @param inselXY
 	 * @return 0 als falsch oder eine Zufallszahl als wahr
 	 */
-	private int possibleValuesNW(Island chosenIsland, int xy, int islandXY) {
-		int possibleValues = xy + (islandXY - x-2);
+	private int possibleValuesNW(Island chosenIsland, int xy, int islandXY, Directions direction) {
+		int possibleValues = 0;
+		if(direction == Directions.NORTH)
+			possibleValues = xy + (islandXY - y-2);
+		else
+			possibleValues = xy + (islandXY - x-2);
 		if(possibleValues <= 0) {			
 			return 0;
 		} else {
 			possibleValues = (random.nextInt(possibleValues));
 			if(possibleValues == 0) {
-				if((islandXY - 2) < 0)
+				if((islandXY - 2) <= 0)
 					return possibleValues =0;
 				else
 					return possibleValues = islandXY- 2;

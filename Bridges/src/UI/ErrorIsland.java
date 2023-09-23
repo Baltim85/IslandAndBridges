@@ -8,11 +8,14 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Font;
+import java.awt.Color;
 
 /**
  * Ein benutzerdefinierter Dialog für die Bestätigung des Spielendes.
  */
-public class ExitDialog extends JDialog{
+public class ErrorIsland extends JDialog{
 
 
 	// Eindeutige Serial-Version-ID zur Serialisierung der Klasse.
@@ -22,7 +25,7 @@ public class ExitDialog extends JDialog{
 	private final JPanel contentPanel = new JPanel();
 
 	// Schaltflächen zum Abbrechen und Beenden des Dialogs.
-	private JButton btnNo, btnExit;
+	private JButton btnNo;
 
 	// Beschriftungen für Aufmerksamkeit und Anfrage.
 	private JLabel lblAttention, lblRequest;
@@ -32,7 +35,7 @@ public class ExitDialog extends JDialog{
 	/**
 	 * Erstellt einen neuen ExitDialog.
 	 */
-	public ExitDialog() {
+	public ErrorIsland() {
 		// Dialog-Größe und Layout festlegen
 		setBounds(100, 100, 358, 170);
 		getContentPane().setLayout(new BorderLayout());
@@ -44,26 +47,25 @@ public class ExitDialog extends JDialog{
 		contentPanel.setLayout(null);
 
 		// "Nein"-Button erstellen und positionieren
-		btnNo = new JButton("Nein");
-		btnNo.setBounds(10, 93, 144, 23);
-
-		// "Beenden"-Button erstellen und positionieren
-		btnExit = new JButton("Beenden");
-		btnExit.setBounds(188, 93, 144, 23);
+		btnNo = new JButton("OK");
+		btnNo.setBounds(96, 93, 144, 23);
 
 		// Hinweislabel erstellen und positionieren
-		lblAttention = new JLabel("Achtung! Nicht gespeicherter Fortschritt geht verloren!");
+		lblAttention = new JLabel("Achtung!");
+		lblAttention.setForeground(new Color(255, 0, 0));
+		lblAttention.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblAttention.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAttention.setBounds(10, 23, 332, 23);
 
 		// Anforderungslabel erstellen und positionieren
-		lblRequest = new JLabel("Möchten Sie das Spiel wirklich Beenden?");
+		lblRequest = new JLabel("Eine oder mehrere Inseln enthalten zuviele Brücken!");
+		lblRequest.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblRequest.setBounds(10, 59, 332, 23);
 
 		// Komponenten zum Panel hinzufügen
 		contentPanel.add(lblAttention);
 		contentPanel.add(lblRequest);
 		contentPanel.add(btnNo);
-		contentPanel.add(btnExit);
 
 		// Dialog modal machen (blockiert andere Interaktionen)
 		setModal(true);
@@ -92,23 +94,6 @@ public class ExitDialog extends JDialog{
 		this.btnNo = btnNo;
 	}
 
-	/**
-	 * Gibt den "Exit"-Button zurück.
-	 * 
-	 * @return der "Exit"-Button
-	 */
-	public JButton getBtnExit() {
-		return btnExit;
-	}
-
-	/**
-	 * Setzt den "Exit"-Button.
-	 * 
-	 * @param btnExit der zu setzende "Exit"-Button
-	 */
-	public void setBtnExit(JButton btnExit) {
-		this.btnExit = btnExit;
-	}
 
 	/**
 	 * Gibt die Serial Version UID zurück.

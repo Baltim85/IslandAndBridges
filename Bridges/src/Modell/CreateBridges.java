@@ -169,12 +169,20 @@ public class CreateBridges {
 		counter = 0;
 		setOk(false);
 		firstIslandConnection();
-		
-			
-		
-		
+	
 	}
 	
+	
+	public CreateBridges(int firstIslandID, int firstIslandX, int firstIslandY,
+			int secondIslandID, int secondIslandX, int secondIslandY) {
+		this.firstIslandID = firstIslandID;
+		this.firstIslandX = firstIslandX;
+		this.firstIslandY = firstIslandY;
+		
+		this.secondIslandID = secondIslandID;
+		this.secondIslandX = secondIslandX;
+		this.secondIslandY = secondIslandY;
+	}
 
 	private void resetValues(ArrayList<Island> isolatedIslands) {
 		for(Island islands : isolatedIslands) {

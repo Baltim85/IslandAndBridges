@@ -4,6 +4,7 @@ package Controller;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 
@@ -14,6 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import UI.Bridges;
+import UI.ErrorIsland;
 import UI.ExitDialog;
 import UI.NewPuzzle;
 import UI.NoGame;
@@ -37,6 +39,18 @@ public class ActionController {
 	private NoGame saveInfo;         // Ein Dialogfenster für fehlende Spielinformationen
 	private SaveGame save;           // Eine Klasse zur Speicherung von Spielständen
 	private LoadGame load;           // Eine Klasse zur Verwaltung des Ladens von Spielständen
+	
+	private ErrorIsland errorInfo;
+
+	public ErrorIsland getErrorInfo() {
+		return errorInfo;
+	}
+
+
+
+	public void setErrorInfo(ErrorIsland errorInfo) {
+		this.errorInfo = errorInfo;
+	}
 
 	// Felder zur Verwaltung von Spielinformationen und Zuständen
 	private int height;              // Die Höhe des Spielfelds
@@ -56,8 +70,7 @@ public class ActionController {
 	// Zufallszahlengenerator für die Erstellung von zufälligen Puzzle-Größen
 	private Random randomSize = new Random();
 
-	// Fehlermeldung für ungültige Eingaben
-	private String nan = "Sie müssen eine Zahl zwischen: " + minValue + " und " + maxValue + " eingeben!";
+
 
 	// Eine Liste von Inseln im aktuellen Puzzle
 	private ArrayList<Island> listofIslands = new ArrayList<Island>();
@@ -68,9 +81,15 @@ public class ActionController {
 	// Ein Flag, das angibt, ob der BridgeController bereits erstellt wurde
 	private boolean controllerExist = false;
 	
-    
-    private static final int DEFAULT_CENTER_X = 0;
-    private static final int DEFAULT_CENTER_Y = 0;
+	// Hier wird eine ArrayList erstellt, die als Deep Copy für andere Listen verwendet werden kann.
+	private ArrayList<Island> deepCopy = new ArrayList<Island>(); 
+
+	// Hier wird eine Konstante für den Standardwert des X-Zentrums definiert.
+	private static final int DEFAULT_CENTER_X = 0; 
+	
+	// Hier wird eine Konstante für den Standardwert des Y-Zentrums definiert.
+	private static final int DEFAULT_CENTER_Y = 0; 
+
     
     
     /**
@@ -81,6 +100,7 @@ public class ActionController {
     public ActionController(Bridges bridges) {
         this.bridges = bridges;
         exitGame = new ExitDialog();
+        errorInfo = new ErrorIsland();
         puzzle = new NewPuzzle();
         checkInput = new CheckInput();
         bridgeC = new BridgeController();
@@ -108,14 +128,24 @@ public class ActionController {
 	    exitGame.getBtnExit().addActionListener(e -> ExitGame()); // Beendet das Spiel
 	    exitGame.getBtnNo().addActionListener(e -> DisposeView()); // Schließt das Bestätigungsdialogfenster
 
+	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
+	    
+	    
 	    // Puzzle-Einstellungen
 	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die automatische Größenanpassung
 	    puzzle.getRbnSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die manuelle Größeneinstellung
 	    puzzle.getCbDefineIslands().addActionListener(e -> ToggleIslands()); // Aktiviert die Einstellung der Inselanzahl
-	    puzzle.getBtnOk().addActionListener(e -> CheckInput()); // Überprüft die Benutzereingabe
+	    puzzle.getBtnOk().addActionListener(e -> checkInput()); // Überprüft die Benutzereingabe
 	    puzzle.getBtnAbord().addActionListener(e -> DisposeView()); // Schließt das Einstellungsfenster
 	}
 	
+	private void ErrorMessage() {
+		errorInfo.dispose();
+		
+	}
+
+
+
 	/**
 	 * Lädt ein gespeichertes Spiel und initialisiert die erforderlichen Komponenten.
 	 */
@@ -245,36 +275,20 @@ public class ActionController {
 	/**
 	 * Überprüft die Benutzereingaben und erstellt ein neues Rätsel basierend auf den Eingaben.
 	 */
-	private void CheckInput() {
-	    // Create a random puzzle game
-	    if (puzzle.getRbnAutoSizeIsland().isSelected()) {
-	        int minSize = 4;
-	        int maxSize = 25;
-	        int minIslands = 2;
-	       
-
-	        // Zufällige Werte für Breite, Höhe und Inseln generieren
-	        height = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
-	        width = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
-	        int maxIslands = (int) (0.2 * width * height);
-	        islands = randomSize.nextInt((maxIslands - minIslands) + 1) + minIslands;
-
-	        // Werte setzen und neues Rätsel erstellen
-	        setWidth(width);
-	        setHeight(height);
-	        setIslands(islands);
-
-	        createBoard(width, height, islands);
-	        return;
-	    }
-
+	private void checkInput() {
 	    try {
+	        if (puzzle.getRbnAutoSizeIsland().isSelected()) {
+	            // Benutzer hat die Option "Automatische Größe" ausgewählt
+	            randomPuzzle();
+	            return;
+	        }
+
 	        // Benutzereingaben für Höhe und Breite abrufen
 	        height = Integer.parseInt(puzzle.getTfHeight().getText());
 	        width = Integer.parseInt(puzzle.getTfWidth().getText());
 
 	        // Benutzereingaben auf Gültigkeit prüfen
-	        if (!checkInput.checkUserWH(width, height)) {
+	        if (!checkInputValidity(width, height)) {
 	            return;
 	        }
 
@@ -283,14 +297,13 @@ public class ActionController {
 	            islands = Integer.parseInt(puzzle.getTfIslands().getText());
 
 	            // Prüfen, ob die Anzahl der Inseln gültig ist
-	            if (!checkInput.checkUserIslands(width, height, islands)) {
+	            if (!checkIslandsValidity(width, height, islands)) {
 	                return;
 	            }
 	        } else {
+	            // Zufällige Anzahl von Inseln zwischen 2 und einem berechneten Maximum generieren
 	            int maxRandomIslands = (int) (0.2 * width * height);
 	            int minRandomIslands = 2;
-
-	            // Zufällige Anzahl von Inseln zwischen 2 und maxRandomIslands generieren
 	            islands = randomSize.nextInt((maxRandomIslands - minRandomIslands) + 1) + minRandomIslands;
 	        }
 
@@ -300,13 +313,73 @@ public class ActionController {
 	        setHeight(height);
 	        setIslands(islands);
 	        createBoard(width, height, islands);
-	        
 	    } catch (NumberFormatException nfe) {
 	        // Fehlermeldung bei ungültigen Eingaben anzeigen
-	        JOptionPane.showMessageDialog(null, nan, "Fehlerhafte Eingabe", JOptionPane.ERROR_MESSAGE);
+	        JOptionPane.showMessageDialog(null, "Ungültige Eingabe. Bitte geben Sie gültige Zahlen ein.", "Fehlerhafte Eingabe", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
+
+	/**
+	 * Prüft die Gültigkeit der Benutzereingaben für Breite und Höhe.
+	 *
+	 * @param width  Die eingegebene Breite.
+	 * @param height Die eingegebene Höhe.
+	 * @return true, wenn die Eingaben gültig sind, ansonsten false.
+	 */
+	private boolean checkInputValidity(int width, int height) {
+	    if (width <= 0 || height <= 0) {
+	        JOptionPane.showMessageDialog(null, "Breite und Höhe müssen größer als 0 sein.", "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
+	    return true;
+	}
+
+	/**
+	 * Prüft die Gültigkeit der Benutzereingaben für die Anzahl der Inseln.
+	 *
+	 * @param width   Die Breite des Spielfelds.
+	 * @param height  Die Höhe des Spielfelds.
+	 * @param islands Die eingegebene Anzahl der Inseln.
+	 * @return true, wenn die Eingaben gültig sind, ansonsten false.
+	 */
+	private boolean checkIslandsValidity(int width, int height, int islands) {
+	    int maxIslands = (int) (0.2 * width * height);
+	    if (islands < 2 || islands > maxIslands) {
+	        JOptionPane.showMessageDialog(null, "Die Anzahl der Inseln muss zwischen 2 und " + maxIslands + " liegen.", "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
+	    return true;
+	}
+
 	
+	
+	/**
+	 * Erstellt ein zufälliges Rätsel basierend auf zufällig generierten Werten für Breite, Höhe und Inselanzahl.
+	 */
+	private void randomPuzzle() {
+	    // Mindest- und Höchstgrößen für das Rätsel und die Mindestanzahl der Inseln festlegen
+	    int minSize = 4;
+	    int maxSize = 25;
+	    int minIslands = 2;
+
+	    // Zufällige Werte für Breite, Höhe und Inselanzahl generieren
+	    height = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
+	    width = randomSize.nextInt((maxSize - minSize) + 1) + minSize;
+	    
+	    // Die maximale Anzahl von Inseln basierend auf der Größe des Spielfelds berechnen
+	    int maxIslands = (int) (0.2 * width * height);
+	    
+	    // Zufällige Anzahl von Inseln zwischen minIslands und maxIslands generieren
+	    islands = randomSize.nextInt((maxIslands - minIslands) + 1) + minIslands;
+
+	    // Werte setzen und ein neues Rätsel erstellen
+	    setWidth(width);
+	    setHeight(height);
+	    setIslands(islands);
+
+	    createBoard(width, height, islands);
+	    return;
+	}
 	
 	/**
 	 * Erstellt ein neues Spielbrett mit den angegebenen Dimensionen und Inseln.
@@ -334,45 +407,41 @@ public class ActionController {
 	        island.createFirstIsland(islands);
 	    } while (!island.isOk());
 
+	    deepCopy.clear();
+		   
+		   for (Island island : island.getListofIslands()) {
+			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
+			    deepCopy.add(islandCopy);
+			}
 	
 	    // Ein neues Gitter-Objekt erstellen
-	   grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), island.getListofIslands());
-
+	   grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
+	   
+	   //Collections.copy(island.getListofIslands(), deepCopy);
 	    
+	   
+	   deepCopy.clear();
+	   
+	   for (Island island : island.getListofIslands()) {
+		    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
+		    deepCopy.add(islandCopy);
+		}
+
+	  
+	   
 	    // Das Puzzle-Fenster schließen
 	    puzzle.dispose();
 
 	    
 	    clearAndAddGrid();
-	    /*
-	    // Das Gitter zur Anzeige hinzufügen
-	    bridges.getDraw().removeAll();
-	    bridges.getDraw().add(grid, BorderLayout.CENTER);
 
-	    // Die Anzeige aktualisieren
-	    bridges.getDraw().revalidate();
-	    bridges.getDraw().repaint();
-	    //grid.revalidate();
-	   // grid.repaint();*/
-	    
-	    //BridgeController bridgeC = new BridgeController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance());
-	    //bridgeC.initController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance());
-	    /*bridges.getDraw().addMouseListener(new MouseAdapter() {
-	        @Override
-	        public void mouseClicked(MouseEvent e) {
-	            // Rufen Sie den Controller auf und übergeben Sie die Mausklick-Koordinaten
-	            int x = e.getX();
-	            int y = e.getY();
-	            bridgeC.handleMouseClick(x, y); // Annahme, dass "controller" Ihr Controller-Objekt ist
-	        }
-	    });*/
 	    int delta = 0;
 	    if(gridValues.getXDistance() < gridValues.getYDistance())
 	    	delta = gridValues.getXDistance();
 	    else
 	    	delta = gridValues.getYDistance();
 	    
-	    bridgeC.initController(island.getListofIslands(), bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height);
+	    bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height, grid);
 	    if(!controllerExist) {
 	    	registerMouseListener();
 	    }
@@ -392,7 +461,7 @@ public class ActionController {
 
 	    // Aktualisiere die Anzeige, um die Änderungen sichtbar zu machen
 	    bridges.getDraw().revalidate();
-	    bridges.getDraw().repaint();
+	    //bridges.getDraw().repaint();
 	}
 	
 	
@@ -412,7 +481,7 @@ public class ActionController {
 	            int y = e.getY();
 
 	            // Den BridgeController aufrufen und die Mausklick-Koordinaten übergeben
-	            bridgeC.handleMouseClick(x, y);
+	            bridgeC.handleMouseClick(x, y, e);
 	        }
 	    });
 	}

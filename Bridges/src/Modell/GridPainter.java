@@ -35,7 +35,40 @@ public class GridPainter extends JPanel{
 	private int islandsA[] = new int[2]; // Ein Array zur Speicherung von Informationen über Inseln
 	private boolean arrayIsland[][]; // Ein zweidimensionales Array zur Verfolgung von Inseln
 	private ArrayList<Island> islandList = new ArrayList<Island>(); // Eine Liste zur Speicherung von Insel-Objekten
-	private int coordinates [][][];
+	private ArrayList<Island> drawGreenBridges = new ArrayList<Island>();
+	private ArrayList<Island> drawRedBridges = new ArrayList<Island>();
+	private ArrayList<Island> drawNormalIslands = new ArrayList<Island>();
+	
+	public ArrayList<Island> getDrawNormalIslands() {
+		return drawNormalIslands;
+	}
+
+
+	public void setDrawNormalIslands(ArrayList<Island> drawNormalIslands) {
+		this.drawNormalIslands = drawNormalIslands;
+	}
+
+
+	public ArrayList<Island> getDrawRedBridges() {
+		return drawRedBridges;
+	}
+
+
+	public void setDrawRedBridges(ArrayList<Island> drawRedBridges) {
+		this.drawRedBridges = drawRedBridges;
+	}
+
+
+	public ArrayList<Island> getDrawGreenBridges() {
+		return drawGreenBridges;
+	}
+
+
+	public void setDrawGreenBridges(ArrayList<Island> drawGreenBridges) {
+		this.drawGreenBridges = drawGreenBridges;
+	}
+
+	private ArrayList<CreateBridges> bridges = new ArrayList<CreateBridges>();
 	
 	/**
 	 * Konstruktor für die GridPainter-Klasse.
@@ -63,6 +96,17 @@ public class GridPainter extends JPanel{
 	    }
 	}
 	
+
+	public ArrayList<CreateBridges> getBridges() {
+		return bridges;
+	}
+
+
+	public void setBridges(ArrayList<CreateBridges> bridges) {
+		this.bridges = bridges;
+	}
+
+
 	/**
 	 * Zeichnet das Gitter und die Inseln auf dieser Komponente.
 	 *
@@ -82,32 +126,23 @@ public class GridPainter extends JPanel{
 
 	    // Zeichne die Inseln
 	    createIslands(4,g);
+	    paintBridges(g);
+	    drawGreenIsland(g);
+	    drawRedIsland(g);
 	}
 	
 
-	
-	
-	/*public void createIslands(Graphics g, int x, int y, int radius) {
+	public void paintBridges(Graphics g) {
+		for(CreateBridges bridges : bridges) {
+			int x = bridges.getFirstIslandX();
+			int y = bridges.getFirstIslandY();
+			int x2 = bridges.getSecondIslandX();
+			int y2 = bridges.getSecondIslandY();
+			g.drawLine(x, y, x2, y2);
+		}
 		
+	}
 
-		for (int i =0; i <islandList.size(); i++) {
-			if(islandList.get(i).getX() < islandList.get(i).getY()) {
-				g.drawString(Integer.toString(islandList.get(i).getId()), x*islandList.get(i).getX()-x, y*islandList.get(i).getY()-y+(int)((y-x)/2));
-				g.drawOval(x*islandList.get(i).getX()-x, y*islandList.get(i).getY()-y+(int)((y-x)/2), x, x);
-				
-			} else {
-				g.drawString(Integer.toString(islandList.get(i).getId()),  x*islandList.get(i).getX()-(int)(x/2)-(int)(y/2), y*islandList.get(i).getY()-y);
-				g.drawOval(x*islandList.get(i).getX()-(int)(x/2)-(int)(y/2), y*islandList.get(i).getY()-y, y, y);
-				
-			}	
-		}
-		for(Island island : islandList) {
-			int id = island.getId();
-			int islandX = islandX;
-			int islandY = 
-		}
-
-	}*/
 
 
 	/**
@@ -134,56 +169,87 @@ public class GridPainter extends JPanel{
 	    int islandX = island.getX();
 	    int islandY = island.getY();
 	    int id = island.getId();
+	    int bridgeCount = island.getBridgeCount();
 	    
 	    int halfX = x / 2;
 	    int halfY = y / 2;
 	    
 	    if (x < y) {
-	        g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
+	    	g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
+	        //g.drawString(Integer.toString(bridgeCount), x * islandX - halfX, y * islandY - halfY);
 	        g.drawOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
 	    } else {
-	        g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
+	    	g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
+	    	//g.drawString(Integer.toString(bridgeCount), x * islandX - (x / 2), y * islandY - (y / 2));
 	        g.drawOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
 	    }
 	}
 
+	/**
+	 * Zeichnet eine einzelne Insel auf das Grafikobjekt g.
+	 * 
+	 * @param g das Grafikobjekt, auf das gezeichnet werden soll
+	 * @param island die Insel, die gezeichnet werden soll
+	 */
+	private void drawGreenIsland(Graphics g) {
+		for(Island island: getDrawGreenBridges()) {
+			  int islandX = island.getX();
+			    int islandY = island.getY();
+			    int id = island.getId();
+			    int bridgeCount = island.getBridgeCount();
+			    
+			    int halfX = x / 2;
+			    int halfY = y / 2;
+			    g.setColor(Color.GREEN);
+			    if (x < y) {
+			    	//g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
+			    	g.fillOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
+			    	g.setColor(Color.BLACK);
+			        g.drawString(Integer.toString(bridgeCount), x * islandX - halfX, y * islandY - halfY);
+			        
+			    } else {
+			    	//g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
+			    	g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
+			    	g.setColor(Color.BLACK);
+			    	g.drawString(Integer.toString(bridgeCount), x * islandX - (x / 2), y * islandY - (y / 2));
+//			        g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
+			    }
+		}
+	}
 	
 
-
-	/*public void createIslands(int islands, Graphics g) {
-		/*for (int i =0; i <islandList.size(); i++) {
-			
-			if(x < y) {
-				g.drawString(Integer.toString(islandList.get(i).getId()), x* islandList.get(i).getX()-(x/2), y * islandList.get(i).getY()-(y/2));
-				g.drawOval(x*islandList.get(i).getX()-x, y*islandList.get(i).getY()-y+(int)((y-x)/2), x, x);			
-			} else {
-				g.drawString(Integer.toString(islandList.get(i).getId()), x* islandList.get(i).getX()-(x /2), y * islandList.get(i).getY()-(y/2));
-				g.drawOval(x*islandList.get(i).getX()-(int)(x/2)-(int)(y/2), y*islandList.get(i).getY()-y, y, y);
-			}	
-			//System.out.println("x: " + islandList.get(i).getX() + " y: " + islandList.get(i).getY());
-		}*/
-		/*for(Island island : islandList) {
-			int islandX = island.getX();
-			int islandY = island.getY();
-			int id = island.getId();
-			
-			int halfX = islandX / 2;
-			int halfY = islandY / 2;
-			
-			
-			
-			if(x < y) {
-				g.drawString(Integer.toString(id), x* islandX-(halfX), y * islandY-(halfY));
-				g.drawOval(x*islandX-x, y*islandY-y+(int)((y-x)/2), x, x);			
-			} else {
-				g.drawString(Integer.toString(id), x* islandX-(x /2), y * islandY-(y/2));
-				g.drawOval(x*islandX-(int)(x/2)-(int)(y/2), y*islandY-y, y, y);
-			}
-
-			
+	/**
+	 * Zeichnet eine einzelne Insel auf das Grafikobjekt g.
+	 * 
+	 * @param g das Grafikobjekt, auf das gezeichnet werden soll
+	 * @param island die Insel, die gezeichnet werden soll
+	 */
+	public void drawRedIsland(Graphics g) {
+		for(Island island: getDrawRedBridges()) {
+			  int islandX = island.getX();
+			    int islandY = island.getY();
+			    int id = island.getId();
+			    int bridgeCount = island.getBridgeCount();
+			    
+			    int halfX = x / 2;
+			    int halfY = y / 2;
+			    g.setColor(Color.RED);
+			    if (x < y) {
+			    	//g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
+			    	g.fillOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
+			    	g.setColor(Color.BLACK);
+			        g.drawString(Integer.toString(bridgeCount), x * islandX - halfX, y * islandY - halfY);
+			        
+			    } else {
+			    	//g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
+			    	g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
+			    	g.setColor(Color.BLACK);
+			    	g.drawString(Integer.toString(bridgeCount), x * islandX - (x / 2), y * islandY - (y / 2));
+//			        g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
+			    }
 		}
-		
-	}*/
+	}
+
 	
 	/**
 	 * Gibt ein Array mit den Informationen zu den Inseln zurück.
