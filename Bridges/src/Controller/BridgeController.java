@@ -121,9 +121,9 @@ public class BridgeController implements MouseListener {
 	    this.height = height;
 
 	    // Ausgabe von Informationen zu den Inseln und ihren Brückenzählern
-	    for (Island island : islandList) {
+	    /*for (Island island : islandList) {
 	        System.out.println("Island: " + island.getId() + " counter " + island.getBridgeCount());
-	    }
+	    }*/
 	    
 	    
 	    errorInfo = new ErrorIsland();
@@ -456,6 +456,17 @@ public class BridgeController implements MouseListener {
 		this.isVisible = isVisible;
 	}
 
+	public void clearLists() {
+		painter.getDrawGreenBridges().clear();
+		painter.getDrawNormalIslands().clear();
+		painter.getDrawRedBridges().clear();
+		//islandList.clear();
+		listOfBridge.clear();
+		//createBridges.getIslandList().clear();
+		createBridges.getListOfBridge().clear();
+		
+		
+	}
 
 
 	/**

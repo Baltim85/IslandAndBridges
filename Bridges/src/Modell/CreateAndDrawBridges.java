@@ -640,7 +640,19 @@ public class CreateAndDrawBridges {
     }
     
     
-    /**
+    public ArrayList<CreateBridges> getListOfBridge() {
+		return listOfBridge;
+	}
+
+
+
+	public void setListOfBridge(ArrayList<CreateBridges> listOfBridge) {
+		this.listOfBridge = listOfBridge;
+	}
+
+
+
+	/**
      * Aktualisiert den Zähler für die Anzahl der Brücken für eine gegebene Brücke.
      *
      * @param bridge Die Brücke, für die der Zähler aktualisiert werden soll.

@@ -14,6 +14,8 @@ import java.awt.Color;
 
 /**
  * Ein benutzerdefinierter Dialog für die Bestätigung des Spielendes.
+ * Diese Klasse erweitert JDialog und stellt einen Dialog dar, der den Benutzer über einen Fehler informiert.
+ * Der Dialog enthält eine Meldung und einen OK-Button zum Schließen des Dialogs.
  */
 public class ErrorIsland extends JDialog{
 
@@ -33,7 +35,9 @@ public class ErrorIsland extends JDialog{
 
 
 	/**
-	 * Erstellt einen neuen ExitDialog.
+	 * Erstellt einen neuen ErrorIsland-Dialog.
+	 * Dieser Dialog wird verwendet, um den Benutzer über einen Fehler zu informieren.
+	 * Der Dialog enthält eine Meldung und einen OK-Button zum Schließen des Dialogs.
 	 */
 	public ErrorIsland() {
 		// Dialog-Größe und Layout festlegen

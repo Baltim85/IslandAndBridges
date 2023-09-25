@@ -120,6 +120,7 @@ public class ActionController {
 	    bridges.getMiQuit().addActionListener(e -> ExitView()); // Öffnet ein Bestätigungsdialogfenster zum Beenden
 	    bridges.getMiSavePuzzle().addActionListener(e -> SaveGame()); // Speichert das aktuelle Spiel
 	    bridges.getMiLoadPuzzle().addActionListener(e -> loadGame()); // Lädt ein gespeichertes Spiel
+	    bridges.getMiRestartPuzzle().addActionListener(e -> restartPuzzle());
 
 	    // Dialog für Spielinformationen
 	    saveInfo.getBtnOK().addActionListener(e -> DisposeView()); // Schließt das Dialogfenster für Spielinformationen
@@ -139,6 +140,56 @@ public class ActionController {
 	    puzzle.getBtnAbord().addActionListener(e -> DisposeView()); // Schließt das Einstellungsfenster
 	}
 	
+	private void restartPuzzle() {
+		System.out.println("Restat");
+		
+		if(!isGameExist()) {
+			return;
+		} else {
+			bridgeC.clearLists();
+			createDeepCopy();
+			   
+			   for (Island island : island.getListofIslands()) {
+				    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
+				    deepCopy.add(islandCopy);
+				}
+			grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
+		    clearAndAddGrid();
+	
+		    int delta = 0;
+		    if(gridValues.getXDistance() < gridValues.getYDistance())
+		    	delta = gridValues.getXDistance();
+		    else
+		    	delta = gridValues.getYDistance();
+		    
+		    bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height, grid);
+			//return null;
+		}
+	}
+
+	private void createDeepCopy() {
+		deepCopy.clear();
+		   
+		for (Island island : island.getListofIslands()) {
+			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
+			    deepCopy.add(islandCopy);
+		}
+	}
+	
+	private boolean gameExist = false;
+
+	public boolean isGameExist() {
+		return gameExist;
+	}
+
+
+
+	public void setGameExist(boolean gameExist) {
+		this.gameExist = gameExist;
+	}
+
+
+
 	private void ErrorMessage() {
 		errorInfo.dispose();
 		
@@ -403,16 +454,17 @@ public class ActionController {
 	    // Solange die Insel noch nicht korrekt ist, weiter Inseln erstellen
 	    do {
 	        System.out.println("Creating new island...\n");
-	        
+	        //island.testMethod();
 	        island.createFirstIsland(islands);
 	    } while (!island.isOk());
 
-	    deepCopy.clear();
+	    /*deepCopy.clear();
 		   
 		   for (Island island : island.getListofIslands()) {
 			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
 			    deepCopy.add(islandCopy);
-			}
+			}*/
+	    createDeepCopy();
 	
 	    // Ein neues Gitter-Objekt erstellen
 	   grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
@@ -420,12 +472,12 @@ public class ActionController {
 	   //Collections.copy(island.getListofIslands(), deepCopy);
 	    
 	   
-	   deepCopy.clear();
+	   /*deepCopy.clear();
 	   
 	   for (Island island : island.getListofIslands()) {
 		    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
 		    deepCopy.add(islandCopy);
-		}
+		}*/
 
 	  
 	   
@@ -445,6 +497,7 @@ public class ActionController {
 	    if(!controllerExist) {
 	    	registerMouseListener();
 	    }
+	    setGameExist(true);
 	    
 	}
 	
