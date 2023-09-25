@@ -214,27 +214,11 @@ public class GridPainter extends JPanel{
 	        int islandX = island.getX();
 	        int islandY = island.getY();
 	        int bridgeCount = island.getBridgeCount();
-
-	       
-
+	        
 	        // Setze die Farbe auf grün
 	        g.setColor(Color.GREEN);
 	        fillIslands(islandX, islandY, bridgeCount, g);
-	        // Bestimme, ob die Breite (x) kleiner ist als die Höhe (y)
-	        /*if (x < y) {
-	            // Zeichne eine gefüllte ovale grüne Insel
-	            g.fillOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
-	            // Setze die Farbe auf schwarz und zeichne die Brückenzahl
-	            g.setColor(Color.BLACK);
-	            g.drawString(Integer.toString(bridgeCount), x * islandX - halfX, y * islandY - halfY);
 
-	        } else {
-	            // Zeichne eine gefüllte ovale grüne Insel
-	            g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
-	            // Setze die Farbe auf schwarz und zeichne die Brückenzahl
-	            g.setColor(Color.BLACK);
-	            g.drawString(Integer.toString(bridgeCount), x * islandX - (x / 2), y * islandY - (y / 2));
-	        }*/
 	    }
 	}
 
@@ -279,24 +263,8 @@ public class GridPainter extends JPanel{
 			  int islandX = island.getX();
 			    int islandY = island.getY();
 			    int bridgeCount = island.getBridgeCount();
-			    
-			    //int halfX = x / 2;
-			    //int halfY = y / 2;
 			    g.setColor(Color.RED);
 			    fillIslands(islandX, islandY, bridgeCount, g);
-			    /*if (x < y) {
-			    	//g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
-			    	g.fillOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
-			    	g.setColor(Color.BLACK);
-			        g.drawString(Integer.toString(bridgeCount), x * islandX - halfX, y * islandY - halfY);
-			        
-			    } else {
-			    	//g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
-			    	g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
-			    	g.setColor(Color.BLACK);
-			    	g.drawString(Integer.toString(bridgeCount), x * islandX - (x / 2), y * islandY - (y / 2));
-//			        g.fillOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
-			    }*/
 		}
 	}
 

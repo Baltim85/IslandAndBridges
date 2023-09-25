@@ -82,39 +82,10 @@ public class Island {
 	    this.centerX = centerX;
 	    this.centerY = centerY;
 
-	    
-	    /*if (id == -1) {
-	        this.setMaxX(x);
-	        this.setMaxY(y);
-	        System.out.println("neu: " + x + " y: " + y);
-	        setFlagNewGame(false);
-	        
-	    }*/
 	}
 	
 	
-	
-	/*public void testMethod() {
-		listofIslands.clear();
-	    possibleIslands.clear();
-	    listOfBridges.clear();
-	    islandMap.clear();
-	    
-	    Island firstIsland = new Island(2, 1, 0, listofIslands, 0, false,
-	            isBridgeEastPossible(), isBridgeSouthPossible(), isBridgeWestPossible(),0,0);
-	    listofIslands.add(firstIsland);
-	    islandMap.put(0, firstIsland);
-	    possibleIslands.add(firstIsland);
-	    createEastIsland(firstIsland);
-	    
-	    createSouthIsland(listofIslands.get(1));
-	    
-	    createWestIsland(listofIslands.get(2));
-	    
-	    createSouthIsland(listofIslands.get(0));
-	    setOk(true);
-	    
-	}/*/
+
 
 
 

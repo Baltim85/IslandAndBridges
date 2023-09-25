@@ -159,7 +159,7 @@ public class CreateBridges {
 		
 	}
 	
-	public CreateBridges(ArrayList<Island> listOfIslands, int width, int height) {
+	/*public CreateBridges(ArrayList<Island> listOfIslands, int width, int height) {
 		isolatedIslands = new ArrayList<Island>();
 		this.listOfIslands =listOfIslands;
 		this.setWidth(width);
@@ -170,7 +170,7 @@ public class CreateBridges {
 		setOk(false);
 		firstIslandConnection();
 	
-	}
+	}*/
 	
 	
 	public CreateBridges(int firstIslandID, int firstIslandX, int firstIslandY,
@@ -245,17 +245,7 @@ public class CreateBridges {
 				notMoveableList.clear();
 				listOfBridges.clear();
 				break;
-				//System.out.println("Error");
-				//counter++;
-				//if(counter == 500) {
-					
-				//	setOk(false);
-				//	break;
-				//}
-				//System.out.println(counter);
-				//firstIslandConnection();
-				
-				//return;
+
 			}
 		}
 		if(!notMoveableList.isEmpty()) {

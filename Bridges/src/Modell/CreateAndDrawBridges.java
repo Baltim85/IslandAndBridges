@@ -1,19 +1,11 @@
 package Modell;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 
-import java.awt.event.MouseListener;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import Controller.BridgeController;
 import UI.Bridges;
-import Modell.CreateBridges;
-import Modell.Directions;
-import Modell.GridPainter;
-import Modell.Island;
+
 
 public class CreateAndDrawBridges {
 
@@ -22,7 +14,6 @@ public class CreateAndDrawBridges {
 	 */
 	private Bridges bridges;
 
-	private static final int LAMBDA = 3;
 
 	/**
 	 * Die Liste der Inseln, die von diesem Controller verwaltet werden.
@@ -87,9 +78,9 @@ public class CreateAndDrawBridges {
 	    this.height = height;
 
 	    // Ausgabe von Informationen zu den Inseln und ihren Brückenzählern
-	    for (Island island : islandList) {
+	    /*for (Island island : islandList) {
 	        System.out.println("Island: " + island.getId() + " counter " + island.getBridgeCount());
-	    }
+	    }*/
 
 	    this.centerX = centerX;
 	    this.centerY = centerY;
@@ -171,8 +162,11 @@ public class CreateAndDrawBridges {
 
                         return;
                     } else {
+                    	if(connectEastOrWestIsland(id, drawLineX, drawLineX2, leftButton, centerY, Directions.WEST))
+                    		return;
+                    		
                         // Schleife zur Überprüfung vorhandener Brücken
-                        for (CreateBridges bridge : listOfBridge) {
+                        /*for (CreateBridges bridge : listOfBridge) {
                             int firstID = bridge.getFirstIslandID();
                             int secondID = bridge.getSecondIslandID();
                             if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
@@ -199,7 +193,7 @@ public class CreateAndDrawBridges {
                                     return;
                                 }
                             }
-                        }
+                        }*/
 
                         if (leftButton) {
                             // Neue Brücke erstellen und zur Liste hinzufügen
@@ -216,7 +210,37 @@ public class CreateAndDrawBridges {
     }
 
 
-
+    private boolean connectWestIsland(int id, int drawLineX, int drawLineX2, int centerY, boolean leftButton) {
+    	 for (CreateBridges bridge : listOfBridge) {
+             int firstID = bridge.getFirstIslandID();
+             int secondID = bridge.getSecondIslandID();
+             if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
+                 if (!leftButton && bridge.getNumberOfBridges() == 2) {
+                     // Doppelte Brücke entfernen und Zähler aktualisieren
+                 	controller.removeDoubleBridge(drawLineX, centerY, drawLineX2, centerY, getSelectedID(), id, Directions.WEST);
+                     updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                     return true;
+                 } else if (!leftButton && bridge.getNumberOfBridges() == 1) {
+                     // Einzelne Brücke entfernen und Zähler aktualisieren
+                 	controller.removeSingleBridge(drawLineX, centerY, drawLineX2, centerY, getSelectedID(), id);
+                     updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                     listOfBridge.remove(bridge);
+                     return true;
+                 } else {
+                 	if (bridge.getNumberOfBridges() == 2) {
+                 		System.out.println("Zu viele Brücken");
+                 		return true;
+                 	}
+                     // Brückenzähler aktualisieren und doppelte Brücke zeichnen
+                     updateBridgeCounter(bridge);
+                     controller.drawDoubleBridge(drawLineX, centerY, drawLineX2, centerY, Directions.WEST, getSelectedID(), id);
+                     decrementBridgeCounter(id, getSelectedID(), islandList);
+                     return true;
+                 }
+             }
+         }
+    	 return false;
+    }
 
     /**
      * Erzeugt eine Brücke in nördlicher Richtung von der ausgewählten Insel.
@@ -264,8 +288,10 @@ public class CreateAndDrawBridges {
                         // Brücke zeichnen
                         controller.drawBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id);
                     } else {
+                    	if(connectNorthOrSouthIsland(id, drawLineY, drawLineY2, centerX, leftButton, Directions.NORTH))
+                    		return;
                         // Schleife zur Überprüfung vorhandener Brücken
-                        for (CreateBridges bridge : listOfBridge) {
+                        /*for (CreateBridges bridge : listOfBridge) {
                             int firstID = bridge.getFirstIslandID();
                             int secondID = bridge.getSecondIslandID();
                             if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
@@ -292,7 +318,7 @@ public class CreateAndDrawBridges {
                                     return;
                                 }
                             }
-                        }
+                        }*/
 
                         if (leftButton) {
                             // Neue Brücke erstellen und zur Liste hinzufügen
@@ -309,6 +335,38 @@ public class CreateAndDrawBridges {
     }
 
 
+    private boolean connectNorthIsland(int id, int drawLineY, int drawLineY2, int centerX, boolean leftButton) {
+    	  for (CreateBridges bridge : listOfBridge) {
+              int firstID = bridge.getFirstIslandID();
+              int secondID = bridge.getSecondIslandID();
+              if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
+                  if (!leftButton && bridge.getNumberOfBridges() == 2) {
+                      // Doppelte Brücke entfernen und Zähler aktualisieren
+                  	controller.removeDoubleBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id, Directions.NORTH);
+                      updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                      return true;
+                  } else if (!leftButton && bridge.getNumberOfBridges() == 1) {
+                      // Einzelne Brücke entfernen und Zähler aktualisieren
+                  	controller.removeSingleBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id);
+                      updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                      listOfBridge.remove(bridge);
+                      return true;
+                  } else {
+                  	if (bridge.getNumberOfBridges() == 2) {
+                  		System.out.println("Zu viele Brücken");
+                  		return true;
+                  	}
+                      // Brückenzähler aktualisieren und doppelte Brücke zeichnen
+                      updateBridgeCounter(bridge);
+                      decrementBridgeCounter(id, getSelectedID(), islandList);
+                      controller.drawDoubleBridge(centerX, drawLineY, centerX, drawLineY2, Directions.NORTH, getSelectedID(), id);
+                      return true;
+                  }
+              }
+          }
+    	  return false;
+    }
+    
     /**
      * Erzeugt eine Brücke in östlicher Richtung von der ausgewählten Insel.
      *
@@ -356,8 +414,10 @@ public class CreateAndDrawBridges {
                         // Brücke zeichnen
                         controller.drawBridge(drawLineX, centerY, drawLineX2, centerY, getSelectedID(), id);
                     } else {
+                    	if(connectEastOrWestIsland(id, drawLineX, drawLineX2, leftButton, centerY, Directions.EAST))
+                    		return;
                         // Schleife zur Überprüfung vorhandener Brücken
-                        for (CreateBridges bridge : listOfBridge) {
+                    	/*for (CreateBridges bridge : listOfBridge) {
                             int firstID = bridge.getFirstIslandID();
                             int secondID = bridge.getSecondIslandID();
                             if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
@@ -384,7 +444,8 @@ public class CreateAndDrawBridges {
                                     return;
                                 }
                             }
-                        }
+                        }*/
+                    	
 
                         if (leftButton) {
                             // Neue Brücke erstellen und zur Liste hinzufügen
@@ -402,6 +463,50 @@ public class CreateAndDrawBridges {
     }
 
 
+    /**
+     * Verbindet Inseln in östlicher oder westlicher Richtung und verwaltet Brücken.
+     *
+     * @param id Die ID der zu verbindenden Insel.
+     * @param drawLineX Die X-Koordinate für das Zeichnen der Brücke.
+     * @param drawLineX2 Die zweite X-Koordinate für das Zeichnen der Brücke (bei doppelter Brücke).
+     * @param leftButton true, wenn der linke Mausknopf gedrückt wurde, sonst false.
+     * @param centerY Die Y-Koordinate der Inseln (für die Brücke).
+     * @param direction Die Richtung der Verbindung (EAST oder WEST).
+     * @return true, wenn die Verbindung erfolgreich hergestellt oder entfernt wurde, sonst false.
+     */
+    private boolean connectEastOrWestIsland(int id, int drawLineX, int drawLineX2, boolean leftButton, int centerY, Directions direction) {
+        for (CreateBridges bridge : listOfBridge) {
+            int firstID = bridge.getFirstIslandID();
+            int secondID = bridge.getSecondIslandID();
+            
+            // Überprüfe, ob die Brücke die zu verbindenden Inseln enthält
+            if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
+                if (!leftButton && bridge.getNumberOfBridges() == 2) {
+                    // Doppelte Brücke entfernen und Zähler aktualisieren
+                    controller.removeDoubleBridge(drawLineX, centerY, drawLineX2, centerY, getSelectedID(), id, direction);
+                    updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                    return true;
+                } else if (!leftButton && bridge.getNumberOfBridges() == 1) {
+                    // Einzelne Brücke entfernen und Zähler aktualisieren
+                    controller.removeSingleBridge(drawLineX, centerY, drawLineX2, centerY, getSelectedID(), id);
+                    updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                    listOfBridge.remove(bridge);
+                    return true;
+                } else {
+                    // Brückenzähler aktualisieren und doppelte Brücke zeichnen
+                    if (bridge.getNumberOfBridges() == 2) {
+                        System.out.println("Zu viele Brücken");
+                        return true;
+                    }
+                    updateBridgeCounter(bridge);
+                    decrementBridgeCounter(id, getSelectedID(), islandList);
+                    controller.drawDoubleBridge(drawLineX, centerY, drawLineX2, centerY, direction, getSelectedID(), id);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
     /**
@@ -450,8 +555,10 @@ public class CreateAndDrawBridges {
                         decrementBridgeCounter(id, getSelectedID(), islandList);
                         controller.drawBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id);
                     } else {
+                    	if(connectNorthOrSouthIsland(id, drawLineY, drawLineY2, centerX, leftButton, Directions.SOUTH))
+                    		return;
                         // Durchlaufen Sie die Liste der Brücken und überprüfen Sie, ob bereits eine Brücke zwischen diesen Inseln existiert.
-                        for (CreateBridges bridge : listOfBridge) {
+                        /*for (CreateBridges bridge : listOfBridge) {
                             int firstID = bridge.getFirstIslandID();
                             int secondID = bridge.getSecondIslandID();
 
@@ -481,7 +588,7 @@ public class CreateAndDrawBridges {
                                     return;
                                 }
                             }
-                        }
+                        }*/
 
                         // Wenn die Schleife bis hierhin gelangt, bedeutet dies, dass keine Brücke zwischen diesen Inseln existiert.
                         if (leftButton) {
@@ -498,6 +605,56 @@ public class CreateAndDrawBridges {
         }
     }
     
+    
+    /**
+     * Verbindet Inseln in nördlicher oder südlicher Richtung und verwaltet Brücken.
+     *
+     * @param id Die ID der zu verbindenden Insel.
+     * @param drawLineY Die Y-Koordinate für das Zeichnen der Brücke.
+     * @param drawLineY2 Die zweite Y-Koordinate für das Zeichnen der Brücke (bei doppelter Brücke).
+     * @param centerX Die X-Koordinate der Inseln (für die Brücke).
+     * @param leftButton true, wenn der linke Mausknopf gedrückt wurde, sonst false.
+     * @param direction Die Richtung der Verbindung (NORTH oder SOUTH).
+     * @return true, wenn die Verbindung erfolgreich hergestellt oder entfernt wurde, sonst false.
+     */
+    private boolean connectNorthOrSouthIsland(int id, int drawLineY, int drawLineY2, int centerX, boolean leftButton, Directions direction) {
+        for (CreateBridges bridge : listOfBridge) {
+            int firstID = bridge.getFirstIslandID();
+            int secondID = bridge.getSecondIslandID();
+            
+            // Überprüfen, ob die Brücke die zu verbindenden Inseln enthält
+            if ((firstID == id && secondID == getSelectedID()) || (firstID == getSelectedID() && secondID == id)) {
+                if (!leftButton && bridge.getNumberOfBridges() == 2) {
+                    // Doppelte Brücke entfernen, Brückenzähler aktualisieren und zurückkehren
+                    controller.removeDoubleBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id, direction);
+                    updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                    return true;
+                } else if (!leftButton && bridge.getNumberOfBridges() == 1) {
+                    // Einzelne Brücke entfernen, Brückenzähler aktualisieren und Brücke aus der Liste entfernen
+                    controller.removeSingleBridge(centerX, drawLineY, centerX, drawLineY2, getSelectedID(), id);
+                    updateRemoveCounter(bridge, getSelectedID(), id, islandList);
+                    listOfBridge.remove(bridge);
+                    return true;
+                } else {
+                    // Brückenzähler aktualisieren, Insel-Brückenzähler verringern und doppelte Brücke zeichnen
+                    if (bridge.getNumberOfBridges() == 2) {
+                        System.out.println("Zu viele Brücken");
+                        return true;
+                    }
+                    updateBridgeCounter(bridge);
+                    decrementBridgeCounter(id, getSelectedID(), islandList);
+                    controller.drawDoubleBridge(centerX, drawLineY, centerX, drawLineY2, direction, getSelectedID(), id);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    
+
+
+
     
 
    
@@ -639,16 +796,6 @@ public class CreateAndDrawBridges {
         return false;
     }
     
-    
-    public ArrayList<CreateBridges> getListOfBridge() {
-		return listOfBridge;
-	}
-
-
-
-	public void setListOfBridge(ArrayList<CreateBridges> listOfBridge) {
-		this.listOfBridge = listOfBridge;
-	}
 
 
 
@@ -820,6 +967,25 @@ public class CreateAndDrawBridges {
 	public void setSelectedID(int selectedID) {
 	    this.selectedID = selectedID;
 	}
+
+    
+    /**
+     * Gibt die Liste der Brücken zurück.
+     *
+     * @return Die Liste der Brücken.
+     */
+    public ArrayList<CreateBridges> getListOfBridge() {
+        return listOfBridge;
+    }
+
+    /**
+     * Setzt die Liste der Brücken auf die angegebene Liste.
+     *
+     * @param listOfBridge Die Liste der Brücken, die gesetzt werden soll.
+     */
+    public void setListOfBridge(ArrayList<CreateBridges> listOfBridge) {
+        this.listOfBridge = listOfBridge;
+    }
 
 
 }
