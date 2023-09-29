@@ -1,13 +1,17 @@
 package Modell;
 
-import static Modell.Directions.EAST;
-import static Modell.Directions.NORTH;
-import static Modell.Directions.SOUTH;
-import static Modell.Directions.WEST;
+//import static Modell.Directions.EAST;
+//import static Modell.Directions.NORTH;
+//import static Modell.Directions.SOUTH;
+//import static Modell.Directions.WEST;
 
 import java.util.ArrayList;
-import java.util.Random;
+//import java.util.Random;
 
+/**
+ * Die Klasse "CreateBridges" repräsentiert Brückenverbindungen zwischen Inseln im Spiel.
+ * Sie enthält Informationen über die verbundenen Inseln, Brückentypen und Positionen.
+ */
 public class CreateBridges {
 
 	
@@ -159,7 +163,7 @@ public class CreateBridges {
 		
 	}
 	
-	public CreateBridges(ArrayList<Island> listOfIslands, int width, int height) {
+	/*public CreateBridges(ArrayList<Island> listOfIslands, int width, int height) {
 		isolatedIslands = new ArrayList<Island>();
 		this.listOfIslands =listOfIslands;
 		this.setWidth(width);
@@ -170,7 +174,7 @@ public class CreateBridges {
 		setOk(false);
 		firstIslandConnection();
 	
-	}
+	}*/
 	
 	
 	public CreateBridges(int firstIslandID, int firstIslandX, int firstIslandY,
@@ -184,7 +188,7 @@ public class CreateBridges {
 		this.secondIslandY = secondIslandY;
 	}
 
-	private void resetValues(ArrayList<Island> isolatedIslands) {
+	/*private void resetValues(ArrayList<Island> isolatedIslands) {
 		for(Island islands : isolatedIslands) {
 			setIslandX(islands.getX());
 			setIslandY(islands.getY());
@@ -194,10 +198,10 @@ public class CreateBridges {
 			islands.setWest(isWestBridge());
 			islands.setBridgeCount(0);			
 		}
-	}
+	}*/
 	
 	
-	private void firstIslandConnection() {
+	/*private void firstIslandConnection() {
 		for(int i =0; i < listOfIslands.size(); i++) {
 			isolatedIslands.add(listOfIslands.get(i));
 		}
@@ -229,9 +233,9 @@ public class CreateBridges {
 			//firstIslandConnection();
 		}
 		
-	}
+	}*/
 	
-	private void createNextBridges() {
+	/*private void createNextBridges() {
 		while(!isolatedIslands.isEmpty()) {
 			if(connectedIslands.isEmpty()) {
 				checkDirection(getFirstIsland());
@@ -245,17 +249,7 @@ public class CreateBridges {
 				notMoveableList.clear();
 				listOfBridges.clear();
 				break;
-				//System.out.println("Error");
-				//counter++;
-				//if(counter == 500) {
-					
-				//	setOk(false);
-				//	break;
-				//}
-				//System.out.println(counter);
-				//firstIslandConnection();
-				
-				//return;
+
 			}
 		}
 		if(!notMoveableList.isEmpty()) {
@@ -270,7 +264,7 @@ public class CreateBridges {
 			setOk(true);
 			return;
 		}
-	}
+	}*/
 	
 	
 	
@@ -286,7 +280,7 @@ public class CreateBridges {
 	 * 
 	 * @param choosenIsland the island that wants a connection in the west direction
 	 */
-	public boolean createWestBridge(Island choosenIsland) {	
+	/*public boolean createWestBridge(Island choosenIsland) {	
 		//setListOfIslands(listofIslands);
 		int bridges = 1+ new Random().nextInt(2);
 		connectionFromTo = new ArrayList<Integer>();
@@ -307,7 +301,7 @@ public class CreateBridges {
 		}
 		choosenIsland.setWest(false);
 		return false;
-	}
+	}*/
 
 	/**
 	 * createEastBridge will create another bridge in the East direction, if there is another island
@@ -320,7 +314,7 @@ public class CreateBridges {
 	 * 
 	 * @param choosenIsland the island that wants a connection in the East direction
 	 */
-	private void createEastBridge(Island choosenIsland) {
+	/*private void createEastBridge(Island choosenIsland) {
 		//setListOfIslands(listofIslands);
 		int bridges = 1+ new Random().nextInt(2);
 		connectionFromTo = new ArrayList<Integer>();
@@ -341,7 +335,7 @@ public class CreateBridges {
 		}
 		choosenIsland.setEast(false);
 		return;
-	}
+	}*/
 	
 	
 	/**
@@ -354,7 +348,7 @@ public class CreateBridges {
 	 * @param position the current y position 
 	 * @return true or false
 	 */
-	private boolean isNorthSouthBridge(Island choosenIsland, int position) {
+	/*private boolean isNorthSouthBridge(Island choosenIsland, int position) {
 		if(listOfBridges.isEmpty() || listOfBridges == null) {
 			return false;
 		}
@@ -368,7 +362,7 @@ public class CreateBridges {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	
 	/**
@@ -381,7 +375,7 @@ public class CreateBridges {
 	 * @param position the current x position 
 	 * @return true or false
 	 */
-	private boolean isWestEastBridge(Island choosenIsland, int position) {
+	/*private boolean isWestEastBridge(Island choosenIsland, int position) {
 		if(listOfBridges.isEmpty() || listOfBridges == null) {
 			return false;
 		}
@@ -395,7 +389,7 @@ public class CreateBridges {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	/**
 	 * findIsolatedIslandsWE returns an isolated island in the West or East direction depending on the direction
@@ -409,7 +403,7 @@ public class CreateBridges {
 	 * @param bridges the number of bridges
 	 * @return true if an isolated island was found and connected else false
 	 */
-	private boolean findIsolatedIslandWE(Island westIsland, int position, Directions direction, int bridges) {
+	/*private boolean findIsolatedIslandWE(Island westIsland, int position, Directions direction, int bridges) {
 		for(int j =0; j < isolatedIslands.size(); j++) {
 			if(isolatedIslands.get(j).getY() == westIsland.getY() && isolatedIslands.get(j).getX() == position) {
 				if(connectedIslands.isEmpty()) {
@@ -440,10 +434,10 @@ public class CreateBridges {
 			}
 		}		
 		return false;
-	}
+	}*/
 	
 	
-	private boolean findConnectedIslandEW(Island westIsland, int position, Directions direction, int bridges) {
+	/*private boolean findConnectedIslandEW(Island westIsland, int position, Directions direction, int bridges) {
 		for(int j = 0; j < connectedIslands.size(); j++) {
 			if(westIsland.getId() != connectedIslands.get(j).getId()) {
 				if(connectedIslands.get(j).getY() == westIsland.getY() && connectedIslands.get(j).getX() == position) {
@@ -469,7 +463,7 @@ public class CreateBridges {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	
 	/**
@@ -483,7 +477,7 @@ public class CreateBridges {
 	 * 
 	 * @param choosenIsland the island that wants a connection in the south direction
 	 */
-	private void createSouthBridge(Island choosenIsland) {
+	/*private void createSouthBridge(Island choosenIsland) {
 		//setListOfIslands(listofIslands);
 		int bridges = 1+ new Random().nextInt(2);
 		for(int i = choosenIsland.getY()+1; i < getHeight(); i++ ) {
@@ -503,7 +497,7 @@ public class CreateBridges {
 		}
 		choosenIsland.setSouth(false);
 		return;	
-	}
+	}*/
 	
 	/**
 	 * createNorthBridge will create another bridge in the North direction, if there is another island
@@ -516,7 +510,7 @@ public class CreateBridges {
 	 * 
 	 * @param choosenIsland the island that wants a connection in the north direction
 	 */
-	private void createNorthBridge(Island choosenIsland) {	
+	/*private void createNorthBridge(Island choosenIsland) {	
 		//setListOfIslands(listofIslands);
 		int bridges = 1+ new Random().nextInt(2);
 		for(int i = choosenIsland.getY()-1; i > 0; i-- ) {
@@ -537,7 +531,7 @@ public class CreateBridges {
 		}
 		choosenIsland.setNorth(false);
 		return;
-	}
+	}*/
 	
 	
 	/**
@@ -552,7 +546,7 @@ public class CreateBridges {
 	 * @param bridges the number of bridges
 	 * @return true if an isolated island was found and connected else false
 	 */
-	private boolean findConnectedIslandNS(Island northIsland, int position, Directions direction, int bridges) {
+	/*private boolean findConnectedIslandNS(Island northIsland, int position, Directions direction, int bridges) {
 		for(int j = 0; j < connectedIslands.size(); j++) {
 			if(northIsland.getId() != connectedIslands.get(j).getId()) {
 				if(connectedIslands.get(j).getX() == northIsland.getX() && connectedIslands.get(j).getY() == position) {
@@ -606,7 +600,7 @@ public class CreateBridges {
 		}
 		
 		return false;
-	}
+	}*/
 	
 	/**
 	 * addNSBridgeToList will add a new Bridge into the list from North to South
@@ -615,7 +609,7 @@ public class CreateBridges {
 	 * @param southIsland the lower island and always the second 
 	 * @param bridges the number of bridges that will be created in this direction
 	 */
-	private void addNSBridgeToList(Island northIsland, Island southIsland, int bridges) {
+	/*private void addNSBridgeToList(Island northIsland, Island southIsland, int bridges) {
 		connectionFromTo = new ArrayList<Integer>();
 		for(int k = northIsland.getY()+1; k < southIsland.getY(); k++) {
 			connectionFromTo.add(k);
@@ -623,7 +617,7 @@ public class CreateBridges {
 		listOfBridges.add(new Bridges(northIsland.getId(), northIsland.getX(), northIsland.getY(), 
 				southIsland.getId(), southIsland.getX(), southIsland.getY(),bridges, connectionFromTo));	
 		return;
-	}
+	}*/
 	
 	/**
 	 * addWEBridgeToList will add a new Bridge into the list from West to East
@@ -632,7 +626,7 @@ public class CreateBridges {
 	 * @param eastIsland the right island in the puzzle to set a connection
 	 * @param bridges the number of bridges that will be created in this direction
 	 */
-	private void addWEBridgeToList(Island westIsland, Island eastIsland, int bridges) {
+	/*private void addWEBridgeToList(Island westIsland, Island eastIsland, int bridges) {
 		connectionFromTo = new ArrayList<Integer>();
 		for(int k = westIsland.getX()+1; k <eastIsland.getX(); k++) {
 			connectionFromTo.add(k);
@@ -640,7 +634,7 @@ public class CreateBridges {
 		listOfBridges.add(new Bridges(westIsland.getId(), westIsland.getX(), westIsland.getY(),
 				eastIsland.getId(), eastIsland.getX(), eastIsland.getY(),bridges, connectionFromTo));
 		return;
-	}
+	}*/
 	
 	
 	/**
@@ -652,15 +646,15 @@ public class CreateBridges {
 	 * @param choosenIsland the island that creates the connection to the isolated island
 	 * @param bridges the number ob bridges between both islands
 	 */
-	private void addIslandUpdateBridges(int index, Island choosenIsland, int bridges) {
+	/*private void addIslandUpdateBridges(int index, Island choosenIsland, int bridges) {
 		connectedIslands.add(isolatedIslands.get(index));
 		isolatedIslands.get(index).setBridgeCount(isolatedIslands.get(index).getBridgeCount() + bridges);
 		choosenIsland.setBridgeCount(choosenIsland.getBridgeCount() + bridges);
 		isolatedIslands.remove(index);	
-	}
+	}*/
 	
 	
-	private void checkDirection(Island chooseIsland) {
+	/*private void checkDirection(Island chooseIsland) {
 		int direction = 0;
 		// true, false, false, false
 		if(chooseIsland.isNorth() && !chooseIsland.isEast() && !chooseIsland.isSouth() && !chooseIsland.isWest()) {
@@ -869,7 +863,7 @@ public class CreateBridges {
 			
 		}
 		
-	}
+	}*/
 
 	
 

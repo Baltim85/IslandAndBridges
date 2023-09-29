@@ -45,7 +45,7 @@ public class LoadGame {
                     // Zeile ausgeben (für Debugging-Zwecke)
                     // System.out.println(line);
 
-                    if (line.contains("# Width x Height | Number of islands")) {
+                    if (line.contains("# Width x Height | Number of islands")){//) || line.contains("FIELD")) {
                         // Zeile mit Spielfeldgröße und Anzahl der Inseln gefunden
                         line = bufferedReader.readLine();
                         String[] parts = line.split("\\|");
@@ -62,6 +62,25 @@ public class LoadGame {
                             }
                         }
                     }
+                    
+                    if (line.contains("FIELD")) {
+                        // Zeile mit Spielfeldgröße und Anzahl der Inseln gefunden
+                        line = bufferedReader.readLine();
+                        String[] parts = line.split("\\|");
+
+                        if (parts.length >= 2) {
+                            String dimensions = parts[0].trim();
+                            String islandsStr = parts[1].trim();
+
+                            String[] dimensionParts = dimensions.split("x");
+                            if (dimensionParts.length >= 2) {
+                                setWidth(Integer.parseInt(dimensionParts[0].trim()));
+                                setHeight(Integer.parseInt(dimensionParts[1].trim()));
+                                setIslands(Integer.parseInt(islandsStr));
+                            }
+                        }
+                    }
+                   
 
                     if (line.contains("ISLANDS")) {
                         islandsSection = true;
@@ -77,7 +96,7 @@ public class LoadGame {
                             int x = Integer.parseInt(matcher.group(1));
                             int y = Integer.parseInt(matcher.group(2));
                             int bridge = Integer.parseInt(matcher.group(3));
-                            islandsList.add(new int[]{x, y, bridge});
+                            islandsList.add(new int[]{x+1, y+1, bridge});
                         }
                     }
                 }

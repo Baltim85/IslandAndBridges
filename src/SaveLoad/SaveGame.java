@@ -203,8 +203,8 @@ public class SaveGame {
      * @param island  die Insel, die dem StringBuilder hinzugefügt werden soll.
      */
     private void appendIslandInfo(StringBuilder content, Island island) {
-        int x = island.getX();
-        int y = island.getY();
+        int x = island.getX()-1;
+        int y = island.getY()-1;
         int bridges = island.getBridgeCount();
         String islandInfo = "( " + x + ", " + y + " | " + bridges + " )\n";
         content.append(islandInfo);
