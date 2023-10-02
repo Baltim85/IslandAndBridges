@@ -5,6 +5,7 @@ package Controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 
@@ -17,11 +18,12 @@ import java.awt.event.MouseEvent;
 import UI.Bridges;
 import UI.ErrorIsland;
 import UI.ExitDialog;
+import UI.FinishedGame;
 import UI.NewPuzzle;
 import UI.NoGame;
 import Modell.CalculateGrid;
 import Modell.CheckInput;
-
+import Modell.CreateBridges;
 import Modell.GridPainter;
 import Modell.Island;
 
@@ -41,6 +43,7 @@ public class ActionController {
 	private LoadGame load;           // Eine Klasse zur Verwaltung des Ladens von Spielständen
 	
 	private ErrorIsland errorInfo;
+	private FinishedGame completeGame;
 
 	public ErrorIsland getErrorInfo() {
 		return errorInfo;
@@ -56,7 +59,7 @@ public class ActionController {
 	private int height;              // Die Höhe des Spielfelds
 	private int width;               // Die Breite des Spielfelds
 	private int islands;             // Die Anzahl der Inseln auf dem Spielfeld
-	private CheckInput checkInput;   // Ein Objekt zur Überprüfung von Benutzereingaben
+	//private CheckInput checkInput;   // Ein Objekt zur Überprüfung von Benutzereingaben
 
 	// Felder zur Darstellung des Spielfelds und der Inseln
 	private GridPainter grid;       // Das Spielfeld, auf dem das Puzzle gezeichnet wird
@@ -64,8 +67,8 @@ public class ActionController {
 	private CalculateGrid gridValues; // Eine Klasse zur Berechnung von Gitterwerten
 
 	// Konstanten für die minimale und maximale Spielfeldgröße
-	private final int minValue = 4;
-	private final int maxValue = 25;
+	//private final int minValue = 4;
+	//private final int maxValue = 25;
 
 	// Zufallszahlengenerator für die Erstellung von zufälligen Puzzle-Größen
 	private Random randomSize = new Random();
@@ -102,10 +105,11 @@ public class ActionController {
         exitGame = new ExitDialog();
         errorInfo = new ErrorIsland();
         puzzle = new NewPuzzle();
-        checkInput = new CheckInput();
+        //checkInput = new CheckInput();
         bridgeC = new BridgeController();
         save = new SaveGame();
         saveInfo = new NoGame();
+        completeGame = new FinishedGame();
         addListener();
     }
 	
@@ -131,6 +135,8 @@ public class ActionController {
 
 	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
 	    
+	    completeGame.getBtnNo().addActionListener(e -> completedGame());
+	    
 	    
 	    // Puzzle-Einstellungen
 	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die automatische Größenanpassung
@@ -140,6 +146,14 @@ public class ActionController {
 	    puzzle.getBtnAbord().addActionListener(e -> DisposeView()); // Schließt das Einstellungsfenster
 	}
 	
+	private void completedGame() {
+		// TODO Auto-generated method stub
+		System.out.println("Game Win");
+		completeGame.dispose();
+	}
+
+
+
 	private void restartPuzzle() {
 		System.out.println("Restat");
 		
@@ -209,40 +223,77 @@ public class ActionController {
 
 	    // Erstellen einer Liste von Inseln durch Verarbeitung der Informationen aus der Datei
 	    ArrayList<Island> islandsA = new ArrayList<Island>();
+	    
 	    for (int[] islandInfo : load.getIslandsList()) {
 	        int x = islandInfo[0];
 	        int y = islandInfo[1];
 	        int bridge = islandInfo[2];
 	        
 	        // Eine Insel erstellen und zur Liste hinzufügen
-	        Island islands = new Island(x, y, islandsA.size() + 1, bridge);
-	        islandsA.add(islands);
+	        island = new Island(x, y, islandsA.size(), bridge);
+	        islandsA.add(island);
 	    }
-
+	    ArrayList<CreateBridges> bridgesList = new ArrayList<CreateBridges>();
+	    for(int [] bridgeInfo : load.getBridgeList()) {
+	    	int firstID = bridgeInfo[0];
+	    	int secondID = bridgeInfo[1];
+	    	int numberBridges = bridgeInfo[2];
+	    	
+	    	int firstX = islandsA.get(firstID).getX();
+	    	int firstY = islandsA.get(firstID).getY();
+	    	int secondX = islandsA.get(secondID).getX();
+	    	int secondY = islandsA.get(secondID).getY();
+	    	bridgesList.add(new CreateBridges(firstID, firstX, firstY, secondID, secondX, secondY, numberBridges, null));
+	    }
+	    
+	    
 	    // Erstellen des Rasters mit den geladenen Informationen
 	    grid = new GridPainter(load.getWidth(), load.getHeight(), gridValues.getXDistance(), gridValues.getYDistance(),  islandsA);
 
+	    deepCopy.clear();
+		   
+		for (Island island : islandsA) {
+			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
+			    deepCopy.add(islandCopy);
+		}
+	    //createDeepCopy();
+	    island.setListofIslands(islandsA);
+	    int delta = 0;
+	    if(gridValues.getXDistance() < gridValues.getYDistance())
+	    	delta = gridValues.getXDistance();
+	    else
+	    	delta = gridValues.getYDistance();
+	    
+	    //bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, load.getWidth(), load.getHeight(), grid);
+	    bridgeC.initController(deepCopy, bridgesList, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, load.getWidth(), load.getHeight(), grid);
+	    setWidth(load.getWidth());
+	    setHeight(load.getHeight());
+	    setIslands(load.getIslands());
+	    if(!controllerExist) {
+	    	registerMouseListener();
+	    }
+	    setGameExist(true);
+	    
 	    // Entfernen der alten Zeichenfläche und Hinzufügen des neuen Rasters
-	    bridges.getDraw().removeAll();
-	    bridges.getDraw().add(grid, BorderLayout.CENTER);
-
-	    // Aktualisieren der Oberfläche
-	    bridges.getDraw().revalidate();
-	    bridges.getDraw().repaint();
-	    grid.revalidate();
-	    grid.repaint();
+	    clearAndAddGrid();
+	    
+	    
 	}
 	
 	/**
 	 * Speichert das aktuelle Spiel, sofern es vorhanden ist, oder zeigt eine Fehlermeldung an.
 	 */
 	private void SaveGame() {
-	    if (island == null) {
+	    if (deepCopy.isEmpty()) {
 	        // Wenn keine Inseln vorhanden sind, wird ein Fehlerdialog angezeigt.
 	        saveInfo.setVisible(true);
 	    } else {
 	        // Speichert das Spiel mit den aktuellen Parametern und der Liste der Inseln.
-	        save.saveGame(getWidth(), getHeight(), getIslands(), island.getListofIslands());
+	        save.saveGame(getWidth(), getHeight(), getIslands(), island.getListofIslands(), bridgeC.getListOfBridge());
+	        for(CreateBridges bridges : bridgeC.getListOfBridge()) {
+	        	System.out.println(bridges.getNumberOfBridges());
+	        }
+	        
 	    }
 	}
 
@@ -378,8 +429,10 @@ public class ActionController {
 	 * @return true, wenn die Eingaben gültig sind, ansonsten false.
 	 */
 	private boolean checkInputValidity(int width, int height) {
-	    if (width <= 0 || height <= 0) {
-	        JOptionPane.showMessageDialog(null, "Breite und Höhe müssen größer als 0 sein.", "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
+		int maxWidth = 25;
+		int maxHeight = 25;
+	    if(width < 4 || width > maxWidth || height < 4 || height > maxHeight) {
+	        JOptionPane.showMessageDialog(null, "Breite und Höhe muss zwischem 4 und 25 liegen.", "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
 	        return false;
 	    }
 	    return true;
@@ -458,6 +511,18 @@ public class ActionController {
 	        island.createFirstIsland(islands);
 	    } while (!island.isOk());
 
+	    /*Collections.sort(listofIslands, new Comparator<Island>() {
+            @Override
+            public int compare(Island island1, Island island2) {
+                int compareX = Integer.compare(island1.getX(), island2.getX());
+                if (compareX == 0) {
+                    // Wenn die X-Koordinaten gleich sind, vergleiche nach Y-Koordinaten
+                    return Integer.compare(island1.getY(), island2.getY());
+                }
+                return compareX;
+            }
+        });*/
+	    
 	    /*deepCopy.clear();
 		   
 		   for (Island island : island.getListofIslands()) {
@@ -498,6 +563,7 @@ public class ActionController {
 	    	registerMouseListener();
 	    }
 	    setGameExist(true);
+	    
 	    
 	}
 	

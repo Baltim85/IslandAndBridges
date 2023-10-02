@@ -1,7 +1,6 @@
 package Modell;
 
-import java.awt.Component;
-import java.awt.event.MouseListener;
+
 import java.util.ArrayList;
 
 

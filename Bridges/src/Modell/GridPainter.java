@@ -103,7 +103,7 @@ public class GridPainter extends JPanel{
 	    islandHolder = new JPanel[cols][rows];
 	    this.setBackground(Color.white);
 	    this.setLayout(new GridLayout(cols, rows, 1, 1));
-	    arrayIsland = new boolean[cols + 1][rows + 1];
+	    arrayIsland = new boolean[cols][rows];
 	    this.islandList = islandList;
 	    for (int i = 0; i < cols; i++) {
 	        for (int j = 0; j < rows; j++) {
@@ -196,6 +196,27 @@ public class GridPainter extends JPanel{
 	        g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
 	        g.drawOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
 	    } else {
+	    	/*if(islandX == 0 && islandY == 0) {
+	    		g.drawString(Integer.toString(id), x  - (x / 2), y-halfY);
+		        g.drawOval(islandX+(halfX)-halfY, islandY, y, y);
+		        return;
+	    	}
+	    	if(islandX == 0) {
+	    		g.drawString(Integer.toString(id), x - (x / 2),y * islandY + (y / 2) );
+	    		g.drawOval(islandX+(halfX)-halfY, y * islandY , y, y);
+	    		return;
+	    	}
+	    	if(islandY == 0) {
+	    		g.drawString(Integer.toString(id), x * islandX  + (x / 2), y-halfY);
+		        g.drawOval(x * islandX + halfY, islandY, y, y);
+		        return;
+	    	}  else {
+	    		g.drawString(Integer.toString(id), x * islandX  + (x / 2), y * islandY + (y / 2));
+		        g.drawOval(x * islandX + halfY, y * islandY, y, y);
+	    		//g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
+		        //g.drawOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
+		        return;
+	    	}*/
 	        // Zeichne die Inselnummer und eine ovalförmige Insel
 	        g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
 	        g.drawOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);

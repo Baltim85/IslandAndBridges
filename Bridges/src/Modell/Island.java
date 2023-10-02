@@ -1,12 +1,18 @@
 package Modell;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-
+/**
+ * Die Klasse "Island" repräsentiert eine Insel im Spiel. Sie speichert Informationen über die Position der Insel,
+ * ihre eindeutige ID, die Anzahl der mit ihr verbundenen Brücken und die Richtungen, in denen Brücken zu benachbarten
+ * Inseln führen können. Diese Klasse ermöglicht die Erstellung und Verwaltung von Inseln im Spiel.
+ */
 public class Island {
 
 	// X- und Y-Koordinaten der aktuellen Insel
@@ -85,10 +91,6 @@ public class Island {
 	}
 	
 	
-
-
-
-
 	/**
 	 * Dieser Konstruktor erstellt ein Objekt der Klasse Island mit den angegebenen Koordinaten, einer ID und einer
 	 * Anzahl von Brücken.
@@ -132,9 +134,41 @@ public class Island {
 	    // Überprüfe, ob die Anzahl der erstellten Inseln der Gesamtanzahl entspricht
 	    if (listofIslands.size() == totalIslands) {
 	        setOk(true);
+	        reindexID();
+	        
 	    } else {
 	        setOk(false);
 	    }
+	}
+	
+	/**
+	 * Diese Methode indiziert die IDs der Inseln in der listofIslands-Liste neu,
+	 * basierend auf ihrer Position in der sortierten Reihenfolge (erst nach X, dann nach Y).
+	 */
+	private void reindexID() {
+	    // Sortiere die listofIslands zuerst nach der X-Koordinate und dann nach der Y-Koordinate.
+	    Collections.sort(listofIslands, new Comparator<Island>() {
+	        @Override
+	        public int compare(Island island1, Island island2) {
+	            // Vergleiche die X-Koordinaten der Inseln.
+	            int compareX = Integer.compare(island1.getX(), island2.getX());
+	            if (compareX == 0) {
+	                // Wenn die X-Koordinaten gleich sind, vergleiche nach Y-Koordinaten.
+	                return Integer.compare(island1.getY(), island2.getY());
+	            }
+	            return compareX;
+	        }
+	    });
+
+	    // Setze einen Zähler für die neuen IDs.
+	    int newID = 0;
+
+	    // Durchlaufe die sortierte Liste und weise den Inseln neue IDs zu.
+	    for (Island island : listofIslands) {
+	        island.setId(newID);
+	        newID++;
+	    }
+	    // Die IDs wurden erfolgreich neu indiziert.
 	}
 	
 	/**

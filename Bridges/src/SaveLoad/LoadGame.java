@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 
+import Modell.Bridges;
+
 /**
  * Die LoadGame-Klasse ermöglicht das Laden von Spielinformationen aus einer Datei.
  * Sie extrahiert die Spielfeldgröße und die Inselinformationen aus der Datei und
@@ -22,159 +24,209 @@ public class LoadGame {
 	private int width, height, islands; // Breite, Höhe und Anzahl der Inseln im Spiel
 	private boolean isReading = true; // Eine Flagge, um anzuzeigen, ob der Ladevorgang aktiv ist
 	private List<int[]> islandsList = new ArrayList<>(); // Eine Liste zur Speicherung der Inselinformationen
+	private static final String FIELD_INFO ="# Width x Height | Number of islands";
 
+	private List<int[]> bridgeList = new ArrayList<>();
+	
+	public List<int[]> getBridgeList() {
+		return bridgeList;
+	}
+
+
+	public void setBridgeList(List<int[]> bridgeList) {
+		this.bridgeList = bridgeList;
+	}
+
+	private ArrayList<Bridges> bridgesList = new ArrayList<>();
+	
 	/**
 	 * Konstruktor für die LoadGame-Klasse, der den Ladevorgang für ein Spiel ausführt.
 	 */
-    public LoadGame() {
-        JFileChooser fileChooser = new JFileChooser();
+	public LoadGame() {
+	    // Einen Dateiauswahldialog erstellen
+	    JFileChooser fileChooser = new JFileChooser();
 
-        // Öffnet einen Dateiauswahldialog
-        int returnValue = fileChooser.showOpenDialog(null);
+	    // Dateiauswahldialog anzeigen und auf die Benutzerwahl warten
+	    int returnValue = fileChooser.showOpenDialog(null);
 
-        boolean islandsSection = false;
+	    // Eine Flagge, um den Abschnitt mit den Inselinformationen zu erkennen
+	    boolean islandsSection = false;
 
-        // Überprüft, ob der Benutzer "Öffnen" ausgewählt hat
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+	    // Überprüfen, ob der Benutzer "Öffnen" ausgewählt hat
+	    if (returnValue != JFileChooser.APPROVE_OPTION) {
+	        System.out.println("Ladevorgang abgebrochen.");
+	        return; // Ladevorgang abbrechen, wenn der Benutzer "Abbrechen" gewählt hat
+	    }
 
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(selectedFile))) {
-                String line;
+	    // Die ausgewählte Datei abrufen
+	    File selectedFile = fileChooser.getSelectedFile();
 
-                while ((line = bufferedReader.readLine()) != null) {
-                    // Zeile ausgeben (für Debugging-Zwecke)
-                    // System.out.println(line);
+	    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(selectedFile))) {
+	        String line;
 
-                    if (line.contains("# Width x Height | Number of islands")) {
-                        // Zeile mit Spielfeldgröße und Anzahl der Inseln gefunden
-                        line = bufferedReader.readLine();
-                        String[] parts = line.split("\\|");
+	        // Zeilen in der Datei nacheinander lesen
+	        while ((line = bufferedReader.readLine()) != null) {
+	            // Wenn die Zeile Informationen zum Spielfeld enthält
+	            if (line.contains(FIELD_INFO)) {
+	                line = bufferedReader.readLine();
+	                // Die Spielfeldinformationen verarbeiten
+	                readFieldInformation(line, bufferedReader);
+	            }
+	            // Wenn die Zeile "FIELD" enthält
+	            else if (line.contains("FIELD")) {
+	                // Zeile mit Spielfeldgröße und Anzahl der Inseln gefunden
+	                line = bufferedReader.readLine();
+	                // Überprüfen, ob die Zeile auch die Spielfeldinformationen enthält
+	                if (line.contains(FIELD_INFO)) {
+	                    line = bufferedReader.readLine();
+	                    // Die Spielfeldinformationen verarbeiten
+	                    readFieldInformation(line, bufferedReader);
+	                } else {
+	                    // Die Spielfeldinformationen verarbeiten
+	                    readFieldInformation(line, bufferedReader);
+	                }
+	            }
 
-                        if (parts.length >= 2) {
-                            String dimensions = parts[0].trim();
-                            String islandsStr = parts[1].trim();
+	            // Wenn die Zeile den Beginn des Inselabschnitts anzeigt
+	            if (line.contains("ISLANDS")) {
+	                islandsSection = true;
+	                continue;
+	            }
 
-                            String[] dimensionParts = dimensions.split("x");
-                            if (dimensionParts.length >= 2) {
-                                setWidth(Integer.parseInt(dimensionParts[0].trim()));
-                                setHeight(Integer.parseInt(dimensionParts[1].trim()));
-                                setIslands(Integer.parseInt(islandsStr));
-                            }
-                        }
-                    }
+	            // Wenn sich das Programm im Inselabschnitt befindet und die Zeile mit "(" beginnt
+	            if (islandsSection && line.trim().startsWith("(")) {
+	                // Die Inselinformationen verarbeiten
+	                readIslandInformation(line, islandsSection);
+	            }
+	            
+	            // Wenn die Zeile den Beginn des Inselabschnitts anzeigt
+	            if (line.contains("BRIDGES")) {
+	                islandsSection = true;
+	                continue;
+	            }
 
-                    if (line.contains("ISLANDS")) {
-                        islandsSection = true;
-                        continue;
-                    }
+	            // Wenn sich das Programm im Inselabschnitt befindet und die Zeile mit "(" beginnt
+	            if (islandsSection && line.trim().startsWith("(")) {
+	                // Die Inselinformationen verarbeiten
+	                readBridgesInformation(line, islandsSection);
+	            }
+	        }
 
-                    if (islandsSection && line.trim().startsWith("(")) {
-                        // Zeile mit Inselinformationen gefunden
-                        Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\)");
-                        Matcher matcher = pattern.matcher(line);
+	        // Den Lesevorgang beenden
+	        setReading(false);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	
+    /**
+     * Extrahiert und verarbeitet Informationen zu den Inseln aus einer Zeile der Datei und speichert sie in der 'islandsList'.
+     *
+     * @param line           Die Zeile aus der Datei, die Informationen zu den Inseln enthält.
+     * @param islandsSection Ein boolescher Wert, der angibt, ob sich der Parser im Abschnitt der Inselinformationen befindet.
+     */
+    private void readBridgesInformation(String line, boolean islandsSection) {
+        // Überprüfen, ob sich der Parser im Abschnitt der Inselinformationen befindet und ob die Zeile mit '(' beginnt
+        if (islandsSection && line.trim().startsWith("(")) {
+        	
+            // Ein regulärer Ausdruck, um Informationen aus der Zeile zu extrahieren
+        	Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+)\\s*\\|\\s*(True|False)\\s*\\)");
+            Matcher matcher = pattern.matcher(line);
 
-                        while (matcher.find()) {
-                            int x = Integer.parseInt(matcher.group(1));
-                            int y = Integer.parseInt(matcher.group(2));
-                            int bridge = Integer.parseInt(matcher.group(3));
-                            islandsList.add(new int[]{x, y, bridge});
-                        }
-                    }
-                }
+            // Solange Übereinstimmungen in der Zeile gefunden werden
+            while (matcher.find()) {
+                // Extrahiere die X-Koordinate der Insel
+                int firstID = Integer.parseInt(matcher.group(1));
 
-                // Jetzt haben Sie die Liste der Inseln, Sie können sie verwenden oder ausdrucken
-                /*for (int[] island : islandsList) {
-                    int x = island[0];
-                    int y = island[1];
-                    int bridge = island[2];
+                // Extrahiere die Y-Koordinate der Insel
+                int secondID = Integer.parseInt(matcher.group(2));
 
-                    System.out.println("Island - X: " + x + ", Y: " + y + ", Bridges: " + bridge);
-                }*/
-
-                setReading(false);
-            } catch (IOException e) {
-                e.printStackTrace();
+                // Extrahiere die Anzahl der Brücken, die mit der Insel verbunden sind
+                boolean doubleBridge = Boolean.parseBoolean(matcher.group(3));
+                int bridgeNumbers = 1;
+                if(doubleBridge)
+                	bridgeNumbers = 2;
+                
+                // Erstelle ein Array mit den extrahierten Informationen (X, Y, Anzahl der Brücken)
+                //int[] islandInfo = new int[]{x + 1, y + 1, bridge};
+                int[] bridgeInfo = new int[]{firstID, secondID, bridgeNumbers};
+                
+                // Füge das Array zur Liste von Inselinformationen hinzu
+                bridgeList.add(bridgeInfo);
             }
-        } else {
-            System.out.println("Ladevorgang abgebrochen.");
         }
     }
+	
+	
 
-	/*public LoadGame() {
-		JFileChooser fileChooser = new JFileChooser();
 
-        // Öffnet einen Dateiauswahldialog
-        int returnValue = fileChooser.showOpenDialog(null);
-        
-        boolean islandsSection = false;
-        // Überprüft, ob der Benutzer "Öffnen" ausgewählt hat
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+    /**
+     * Extrahiert und verarbeitet die Spielfeldinformationen aus einer Zeile der Datei.
+     *
+     * @param line           Die Zeile aus der Datei, die die Spielfeldinformationen enthält.
+     * @param bufferedReader Der BufferedReader, der für das Lesen der Datei verwendet wird.
+     */
+    private void readFieldInformation(String line, BufferedReader bufferedReader) {
+        // Die Zeile in Teile aufteilen, die durch das Trennzeichen '|' getrennt sind
+        String[] parts = line.split("\\|");
 
-            try {
-                // Datei einlesen
-                FileReader fileReader = new FileReader(selectedFile);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+        // Überprüfen, ob ausreichend Teile vorhanden sind
+        if (parts.length >= 2) {
+            // Die erste Komponente enthält die Spielfeldabmessungen im Format "Breite x Höhe"
+            String dimensions = parts[0].trim();
 
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    //System.out.println(line); // Hier kann die Dateiinhalt verarbeitet werden
-                	
-                    if(line.contains("# Width x Height | Number of islands")) {
-                    	System.out.println(line);
-                    	line = bufferedReader.readLine();
-                        String[] parts = line.split("\\|");
-                       
-                        if (parts.length >= 2) {
-                            String dimensions = parts[0].trim();
-                            String islandsStr = parts[1].trim();
+            // Die zweite Komponente enthält die Anzahl der Inseln
+            String islandsStr = parts[1].trim();
 
-                            String[] dimensionParts = dimensions.split("x");
-                            if (dimensionParts.length >= 2) {
-                                setWidth(Integer.parseInt(dimensionParts[0].trim()));
-                                setHeight(Integer.parseInt(dimensionParts[1].trim()));
-                                setIslands(Integer.parseInt(islandsStr));
+            // Die Spielfeldabmessungen in Breite und Höhe aufteilen
+            String[] dimensionParts = dimensions.split("x");
 
-                            }
-                        }
-                    }
-                   
-                        if (line.contains("ISLANDS")) {
-                            islandsSection = true;
-                            continue;
-                        }
+            // Überprüfen, ob ausreichend Teile für Breite und Höhe vorhanden sind
+            if (dimensionParts.length >= 2) {
+                // Die Breite und Höhe des Spielfelds festlegen, indem die Teile in Integer umgewandelt werden
+                setWidth(Integer.parseInt(dimensionParts[0].trim()));
+                setHeight(Integer.parseInt(dimensionParts[1].trim()));
 
-                        if (islandsSection && line.trim().startsWith("(")) {
-                            Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\)");
-                            Matcher matcher = pattern.matcher(line);
-                            while (matcher.find()) {
-                                int x = Integer.parseInt(matcher.group(1));
-                                int y = Integer.parseInt(matcher.group(2));
-                                int bridge = Integer.parseInt(matcher.group(3));
-                                islandsList.add(new int[]{x, y, bridge});
-                            }
-                        }
-                    }
-
-                    // Jetzt haben Sie die Liste der Inseln, Sie können sie verwenden oder ausdrucken
-                    for (int[] island : islandsList) {
-                        int x = island[0];
-                        int y = island[1];
-                        int bridge = island[2];
-
-                        System.out.println("Island - X: " + x + ", Y: " + y + ", Bridges: " + bridge);
-                    }
-                    
-                
-                setReading(false);
-                bufferedReader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                // Die Anzahl der Inseln festlegen, indem der String in Integer umgewandelt wird
+                setIslands(Integer.parseInt(islandsStr));
             }
-        } else {
-            System.out.println("Ladevorgang abgebrochen.");
         }
-    }*/
+    }
+    
+    /**
+     * Extrahiert und verarbeitet Informationen zu den Inseln aus einer Zeile der Datei und speichert sie in der 'islandsList'.
+     *
+     * @param line           Die Zeile aus der Datei, die Informationen zu den Inseln enthält.
+     * @param islandsSection Ein boolescher Wert, der angibt, ob sich der Parser im Abschnitt der Inselinformationen befindet.
+     */
+    private void readIslandInformation(String line, boolean islandsSection) {
+        // Überprüfen, ob sich der Parser im Abschnitt der Inselinformationen befindet und ob die Zeile mit '(' beginnt
+        if (islandsSection && line.trim().startsWith("(")) {
+            // Ein regulärer Ausdruck, um Informationen aus der Zeile zu extrahieren
+            Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\)");
+            Matcher matcher = pattern.matcher(line);
+
+            // Solange Übereinstimmungen in der Zeile gefunden werden
+            while (matcher.find()) {
+                // Extrahiere die X-Koordinate der Insel
+                int x = Integer.parseInt(matcher.group(1));
+
+                // Extrahiere die Y-Koordinate der Insel
+                int y = Integer.parseInt(matcher.group(2));
+
+                // Extrahiere die Anzahl der Brücken, die mit der Insel verbunden sind
+                int bridge = Integer.parseInt(matcher.group(3));
+
+                // Erstelle ein Array mit den extrahierten Informationen (X, Y, Anzahl der Brücken)
+                int[] islandInfo = new int[]{x + 1, y + 1, bridge};
+
+                // Füge das Array zur Liste von Inselinformationen hinzu
+                islandsList.add(islandInfo);
+                
+            }
+        }
+    }
 
 	
 	/**

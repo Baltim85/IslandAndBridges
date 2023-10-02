@@ -7,11 +7,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.ModuleLayer.Controller;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JLabel;
 
 import UI.Bridges;
 import UI.ErrorIsland;
+import UI.FinishedGame;
 import Modell.CreateAndDrawBridges;
 import Modell.CreateBridges;
 import Modell.Directions;
@@ -36,6 +38,7 @@ public class BridgeController implements MouseListener {
 	 * Die Liste der erstellten Brücken.
 	 */
 	private ArrayList<CreateBridges> listOfBridge = new ArrayList<CreateBridges>();
+	
 
 	/**
 	 * Die X-Koordinate des Zentrums.
@@ -89,6 +92,30 @@ public class BridgeController implements MouseListener {
 	private JLabel infoText = new JLabel("Das Spiel ist Fehlerhaft!");
 	
 	
+	private ArrayList<CreateBridges> listOFBridges = new ArrayList<CreateBridges>();
+	public ArrayList<CreateBridges> getListOfBridge() {
+		return listOfBridge;
+	}
+
+
+
+	public void setListOfBridge(ArrayList<CreateBridges> listOfBridge) {
+		this.listOfBridge = listOfBridge;
+	}
+
+	private ArrayList<Island> greenIslands = new ArrayList<Island>();
+	
+	
+	public ArrayList<Island> getGreenIslands() {
+		return greenIslands;
+	}
+
+
+
+	public void setGreenIslands(ArrayList<Island> greenIslands) {
+		this.greenIslands = greenIslands;
+	}
+
 	private ErrorIsland errorInfo;
 
 	public ErrorIsland getErrorInfo() {
@@ -100,6 +127,8 @@ public class BridgeController implements MouseListener {
 	public void setErrorInfo(ErrorIsland errorInfo) {
 		this.errorInfo = errorInfo;
 	}
+	
+	private FinishedGame gameCompleted;
 	
 	
 	/**
@@ -120,14 +149,10 @@ public class BridgeController implements MouseListener {
 	    this.width = width;
 	    this.height = height;
 
-	    // Ausgabe von Informationen zu den Inseln und ihren Brückenzählern
-	    /*for (Island island : islandList) {
-	        System.out.println("Island: " + island.getId() + " counter " + island.getBridgeCount());
-	    }*/
-	    
-	    
 	    errorInfo = new ErrorIsland();
 	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
+	    gameCompleted = new FinishedGame();
+	    gameCompleted.getBtnNo().addActionListener(e -> completeGame());
 	    
 	    this.centerX = centerX;
 	    this.centerY = centerY;
@@ -138,6 +163,52 @@ public class BridgeController implements MouseListener {
 	    calculateCenterForEachIsland(islandList, centerX, centerY);
 	}
 	
+	
+	/**
+	 * Initialisiert den BridgeController mit den angegebenen Parametern und setzt die zugehörigen Felder.
+	 *
+	 * @param islandList Eine Liste von Inseln, die von diesem Controller verwaltet werden.
+	 * @param bridges Die Bridges, die in diesem Controller verwaltet werden.
+	 * @param centerX Die X-Koordinate des Zentrums.
+	 * @param centerY Die Y-Koordinate des Zentrums.
+	 * @param delta Der Abstand (delta) zwischen den Elementen.
+	 * @param width Die Breite des Objekts.
+	 * @param height Die Höhe des Objekts.
+	 */
+	public void initController(ArrayList<Island> islandList, ArrayList<CreateBridges> listOfB, Bridges bridges, int centerX, int centerY
+			, int delta, int width, int height, GridPainter painter) {
+	    this.islandList = islandList;
+	    this.bridges = bridges;
+	    this.width = width;
+	    this.height = height;
+
+	    errorInfo = new ErrorIsland();
+	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
+	    gameCompleted = new FinishedGame();
+	    gameCompleted.getBtnNo().addActionListener(e -> completeGame());
+	    
+	    this.centerX = centerX;
+	    this.centerY = centerY;
+	    this.delta = delta;
+	    listOfBridge.clear();
+	    listOfBridge = listOfB;
+	    
+	    this.painter = painter;
+	    createBridges = new CreateAndDrawBridges(islandList, listOfBridge, bridges, centerX, centerY, delta, width, height, this);
+	    calculateCenterForEachIsland(islandList, centerX, centerY);
+	    createBridges.updateLoadedGame();
+	}
+
+	
+	
+	
+	
+	private void completeGame() {
+		gameCompleted.dispose();
+	}
+
+
+
 	private void ErrorMessage() {
 		errorInfo.dispose();
 		
@@ -441,6 +512,8 @@ public class BridgeController implements MouseListener {
         if(painter.getDrawRedBridges().isEmpty())
     		setVisible(false);
         // Aktualisiere die Anzeige der Brücken.
+        if(!createBridges.getListOfBridge().isEmpty())
+        	checkCompleteStatus();
         bridges.getDraw().repaint();                         
     }
     
@@ -464,8 +537,53 @@ public class BridgeController implements MouseListener {
 		listOfBridge.clear();
 		//createBridges.getIslandList().clear();
 		createBridges.getListOfBridge().clear();
+	
 		
 		
+	}
+
+	
+	private void checkCompleteStatus() {
+	    ArrayList<Integer> islands = new ArrayList<Integer>();
+	    
+
+	    // Füge die IDs der ersten Inseln aus den vorhandenen Brücken hinzu
+	    if (!createBridges.getListOfBridge().isEmpty()) {
+	        islands.add(createBridges.getListOfBridge().get(0).getFirstIslandID());
+	        islands.add(createBridges.getListOfBridge().get(0).getSecondIslandID());
+	    }
+
+	    Iterator<Integer> iterator = islands.iterator();
+	    // Überprüfe, ob die Anzahl der Inseln in der Liste gleich der Gesamtanzahl der Inseln ist
+	    if (painter.getDrawGreenBridges().size() == islandList.size()) {
+	        // Iteriere über die IDs der Inseln
+	        while(iterator.hasNext()) {
+	        	int islandID = iterator.next();
+	        //for (Integer islandID : islands) {
+	            for (int i = 1; i < createBridges.getListOfBridge().size(); i++) {
+	                int firstID = createBridges.getListOfBridge().get(i).getFirstIslandID();
+	                int secondID = createBridges.getListOfBridge().get(i).getSecondIslandID();
+
+	                // Überprüfe, ob die aktuellen IDs in der Brücke vorhanden sind
+	                if (firstID == islandID || secondID == islandID) {
+	                    // Füge die IDs der verbundenen Inseln zur islands-Liste hinzu, wenn sie noch nicht enthalten sind
+	                    if (!islands.contains(firstID)) {
+	                        islands.add(firstID);
+	                        iterator = islands.iterator();
+	                    }
+	                    
+	                    if (!islands.contains(secondID)) {
+	                        islands.add(secondID);
+	                        iterator = islands.iterator();
+	                    }
+	                }
+	            }
+	        }
+	        System.out.println(islands.size());
+	        if(islands.size() == islandList.size())
+	        	gameCompleted.setVisible(true);
+	    }
+
 	}
 
 
@@ -491,6 +609,7 @@ public class BridgeController implements MouseListener {
         else {
             painter.getDrawRedBridges().add(island);
             bridges.getLblInfo().setText("Das Spiel enthält fehler!");
+            // Fehler Meldung
             if(!isVisible()) {
             	errorInfo.setVisible(true);
             	setVisible(true);

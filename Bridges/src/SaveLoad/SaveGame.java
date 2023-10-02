@@ -4,6 +4,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Modell.CreateBridges;
 import Modell.Island;
 
 import java.io.BufferedOutputStream;
@@ -11,6 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 
 /**
@@ -21,10 +24,24 @@ import java.util.ArrayList;
  */
 public class SaveGame {
 	
+	// Header für das Spielfeld
 	private String header ="FIELD\n# Width x Height | Number of islands\n";
+
+	// Header für den Abschnitt mit den Inselinformationen
 	private String islandHeader = "ISLANDS\n + # { ( Column, Row | Number of bridges ) } \n# Columns and rows are 0 indexed!\n";
+
+	// Header für den Abschnitt mit den Brückeninformationen
 	private String bridgesHeader = "\nBRIDGES\n# { ( Start Index, End Index | Double Bridge ) } \n";
-	
+
+	private ArrayList<CreateBridges> listOfBridges = new ArrayList<CreateBridges>();
+	public ArrayList<CreateBridges> getListOfBridges() {
+		return listOfBridges;
+	}
+
+	public void setListOfBridges(ArrayList<CreateBridges> listOfBridges) {
+		this.listOfBridges = listOfBridges;
+	}
+
 	/**
 	 * Speichert den aktuellen Spielstand in einer Datei.
 	 * 
@@ -33,10 +50,10 @@ public class SaveGame {
 	 * @param islands die Anzahl der Inseln auf dem Spielfeld
 	 * @param listofIslands eine ArrayList mit den Informationen zu jeder Insel auf dem Spielfeld
 	 */
-	public void saveGame(int width, int height, int islands, ArrayList<Island> listofIslands) {
+	public void saveGame(int width, int height, int islands, ArrayList<Island> listofIslands, ArrayList<CreateBridges> listOfBridges) {
 	    // Erzeugen Sie einen Dateiauswahldialog
 	    JFileChooser fileChooser = new JFileChooser();
-
+	    setListOfBridges(listOfBridges);
 	    // Legen Sie einen Dateifilter für das ".bgs"-Format fest
 	    FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("BGS-Dateien (*.bgs)", "bgs");
 	    fileChooser.setFileFilter(fileFilter);
@@ -156,13 +173,32 @@ public class SaveGame {
             // Füge den Info-Text und den Island Header hinzu
             appendInfoAndIslandHeader(fileContent, width, height, islands);
 
+         // Sortiere die Inseln zuerst nach der X-Koordinate und dann nach der Y-Koordinate
+            /*Collections.sort(listofIslands, new Comparator<Island>() {
+                @Override
+                public int compare(Island island1, Island island2) {
+                    int compareX = Integer.compare(island1.getX(), island2.getX());
+                    if (compareX == 0) {
+                        // Wenn die X-Koordinaten gleich sind, vergleiche nach Y-Koordinaten
+                        return Integer.compare(island1.getY(), island2.getY());
+                    }
+                    return compareX;
+                }
+            });*/
+            
             // Iteriere über die Inseln und füge sie dem fileContent hinzu
+            int i = 0;
             for (Island island : listofIslands) {
                 appendIslandInfo(fileContent, island);
+                island.setId(i);
+                i++;
             }
 
             // Füge den bridgesHeader hinzu
             fileContent.append(bridgesHeader);
+            for (CreateBridges bridges : listOfBridges) {
+            	appendBridgesInfo(fileContent, bridges);
+            }
 
             // Schreibe alles in die Datei
             bos.write(fileContent.toString().getBytes());
@@ -181,6 +217,28 @@ public class SaveGame {
         content.append(header);
     }
 
+    private void appendBridgesInfo(StringBuilder content, CreateBridges bridge) {
+    	int firstID = 0;
+    	int secondID = 0;
+    	int bridgesNumber = bridge.getNumberOfBridges();
+    	String bridgeInfo = "";
+    	if(bridge.getFirstIslandID() < bridge.getSecondIslandID()) {
+    		firstID = bridge.getFirstIslandID();
+    		secondID = bridge.getSecondIslandID();    		
+    	} else {
+    		firstID = bridge.getSecondIslandID();
+    		secondID = bridge.getFirstIslandID();
+    	} 
+    	
+    	if(bridgesNumber == 2)
+    		bridgeInfo = "True";
+    	else
+    		bridgeInfo = "False";
+    		
+    	String bridgeInfoText = "( " + firstID + ", " + secondID + " | " + bridgeInfo + " )\n";
+    	content.append(bridgeInfoText);
+    }
+    
     /**
      * Fügt Informationen zu Höhe, Breite des Spielfeldes und der Anzahl der Inseln
      * dem StringBuilder 'content' hinzu.
@@ -203,8 +261,8 @@ public class SaveGame {
      * @param island  die Insel, die dem StringBuilder hinzugefügt werden soll.
      */
     private void appendIslandInfo(StringBuilder content, Island island) {
-        int x = island.getX();
-        int y = island.getY();
+        int x = island.getX()-1;
+        int y = island.getY()-1;
         int bridges = island.getBridgeCount();
         String islandInfo = "( " + x + ", " + y + " | " + bridges + " )\n";
         content.append(islandInfo);
