@@ -52,6 +52,7 @@ public class ErrorIsland extends JDialog{
 		// "Ok"-Button erstellen und positionieren
 		btnOk = new JButton("OK");
 		btnOk.setBounds(96, 93, 144, 23);
+		btnOk.addActionListener(e -> disposeView());
 
 		// Hinweislabel erstellen und positionieren
 		lblAttention = new JLabel("Achtung!");
@@ -77,6 +78,12 @@ public class ErrorIsland extends JDialog{
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
+	/**
+	 * Schließt und entsorgt das aktuelle UI-Fenster oder Dialogfeld.
+	 */
+	public void disposeView() {
+	    this.dispose();
+	}
 
 
 	/**

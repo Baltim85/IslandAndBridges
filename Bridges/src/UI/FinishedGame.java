@@ -50,6 +50,7 @@ public class FinishedGame extends JDialog{
 		// "Ok"-Button erstellen und positionieren
 		btnOk = new JButton("Ok");
 		btnOk.setBounds(112, 93, 111, 23);
+		btnOk.addActionListener(e -> disposeView());
 
 		// Hinweislabel erstellen und positionieren
 		lblAttention = new JLabel("Herzlichen Glückwunsch");
@@ -75,8 +76,17 @@ public class FinishedGame extends JDialog{
 		// Standard-Aktion beim Schließen des Dialogs festlegen
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
-
-
+	
+	/**
+	 * Schließt und entsorgt das aktuelle UI-Fenster oder Dialogfeld.
+	 * 
+	 * Diese Methode wird aufgerufen, um das Fenster zu schließen und die damit
+	 * verbundenen Ressourcen freizugeben. Sie wird normalerweise verwendet, wenn der
+	 * Benutzer die Schließtaste des Fensters oder einen ähnlichen Schließmechanismus auslöst.
+	 */
+	private void disposeView() {
+	    this.dispose();
+	}
 
 
 	/**

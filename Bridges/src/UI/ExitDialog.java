@@ -46,10 +46,12 @@ public class ExitDialog extends JDialog{
 		// "Nein"-Button erstellen und positionieren
 		btnNo = new JButton("Nein");
 		btnNo.setBounds(10, 93, 144, 23);
+		btnNo.addActionListener(e ->disposeView());
 
 		// "Beenden"-Button erstellen und positionieren
 		btnExit = new JButton("Beenden");
 		btnExit.setBounds(188, 93, 144, 23);
+		btnExit.addActionListener(e -> exitGame());
 
 		// Hinweislabel erstellen und positionieren
 		lblAttention = new JLabel("Achtung! Nicht gespeicherter Fortschritt geht verloren!");
@@ -71,9 +73,26 @@ public class ExitDialog extends JDialog{
 		// Standard-Aktion beim Schließen des Dialogs festlegen
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
+	
+	/**
+	 * Diese Methode schließt und entsorgt das aktuelle UI-Fenster oder Dialogfeld.
+	 * Sie wird aufgerufen, um das Fenster zu schließen und die damit verbundenen Ressourcen freizugeben.
+	 * Diese Methode wird normalerweise verwendet, wenn der Benutzer die Schließtaste des Fensters oder einen ähnlichen Schließmechanismus auslöst.
+	 */
+	private void disposeView() {
+	    this.dispose();
+	}
 
-
-
+	/**
+	 * Diese Methode beendet das laufende Spiel und schließt die Anwendung.
+	 * Sie wird aufgerufen, um das Spiel und die Anwendung insgesamt zu beenden.
+	 * Der Statuscode 0 gibt an, dass das Programm erfolgreich beendet wurde.
+	 * Beachten Sie, dass das Beenden des Spiels und der Anwendung irreversible Auswirkungen hat und keine Daten gespeichert werden.
+	 * Diese Methode sollte daher mit Vorsicht verwendet werden und nur in Situationen, in denen ein sofortiges Beenden erforderlich ist.
+	 */
+	private void exitGame() {
+	    System.exit(0);
+	}
 	/**
 	 * Gibt den "Nein"-Button zurück.
 	 * 

@@ -10,6 +10,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.Color;
 
 /**
@@ -52,6 +54,8 @@ public class CancelSave extends JDialog{
 		// "Ok"-Button erstellen und positionieren
 		btnOk = new JButton("Ok");
 		btnOk.setBounds(112, 93, 111, 23);
+		btnOk.addActionListener(e -> closeView()); 
+        
 
 		// Hinweislabel erstellen und positionieren
 		lblabord = new JLabel("Speichern wurde Abgebrochen");
@@ -73,6 +77,9 @@ public class CancelSave extends JDialog{
 	}
 
 
+	public void closeView() {
+		this.dispose();
+	}
 
 
 	/**

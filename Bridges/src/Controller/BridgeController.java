@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import UI.Bridges;
 import UI.ErrorIsland;
@@ -150,7 +151,7 @@ public class BridgeController implements MouseListener {
 	    this.height = height;
 
 	    errorInfo = new ErrorIsland();
-	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
+	    //errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
 	    gameCompleted = new FinishedGame();
 	    gameCompleted.getBtnOk().addActionListener(e -> completeGame());
 	    
@@ -183,7 +184,7 @@ public class BridgeController implements MouseListener {
 	    this.height = height;
 
 	    errorInfo = new ErrorIsland();
-	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
+	    //errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
 	    gameCompleted = new FinishedGame();
 	    gameCompleted.getBtnOk().addActionListener(e -> completeGame());
 	    
@@ -209,10 +210,10 @@ public class BridgeController implements MouseListener {
 
 
 
-	private void ErrorMessage() {
+	/*private void ErrorMessage() {
 		errorInfo.dispose();
 		
-	}
+	}*/
 	
     
 	/**
@@ -612,9 +613,10 @@ public class BridgeController implements MouseListener {
             bridges.getLblInfo().setText("Das Spiel enthält fehler!");
             // Fehler Meldung
             if(!isVisible()) {
+            	
             	errorInfo.setLocationRelativeTo(bridges.getDraw());
             	errorInfo.setVisible(true);
-            	//setVisible(true);
+            	
         	}
         }
         

@@ -41,8 +41,8 @@ public class ActionController {
     private LoadGame load;               // Eine Klasse zur Verwaltung des Ladens von Spielständen
     private ErrorIsland errorInfo;       // Ein Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln
     private FinishedGame completeGame;   // Ein Dialogfenster zur Anzeige des Spielabschlusses
-    private SaveGameSuccessfully success; // Ein Dialogfenster zur Anzeige des erfolgreichen Speicherns eines Spielstands
-    private CancelSave cancelSaveOption; // Ein Dialogfenster zur Bestätigung der Abbruchoption beim Speichern
+    //private SaveGameSuccessfully success; // Ein Dialogfenster zur Anzeige des erfolgreichen Speicherns eines Spielstands
+    //private CancelSave cancelSaveOption; // Ein Dialogfenster zur Bestätigung der Abbruchoption beim Speichern
 
 
     private GameLoader loadGame;
@@ -109,8 +109,8 @@ public class ActionController {
 	    save = new SaveGame();                   // Initialisieren der Klasse zur Speicherung von Spielständen
 	    saveInfo = new NoGame();                 // Initialisieren des Dialogfensters für fehlende Spielinformationen
 	    completeGame = new FinishedGame();       // Initialisieren des Dialogfensters zur Anzeige des Spielabschlusses
-	    success = new SaveGameSuccessfully();    // Initialisieren des Dialogfensters zur Anzeige des erfolgreichen Speicherns eines Spielstands
-	    cancelSaveOption = new CancelSave();     // Initialisieren des Dialogfensters zur Bestätigung der Abbruchoption beim Speichern
+	    //success = new SaveGameSuccessfully();    // Initialisieren des Dialogfensters zur Anzeige des erfolgreichen Speicherns eines Spielstands
+	    //cancelSaveOption = new CancelSave();     // Initialisieren des Dialogfensters zur Bestätigung der Abbruchoption beim Speichern
 	    addListener();                           // Hinzufügen von Event-Listenern für die Benutzerinteraktionen
 	}
 
@@ -134,20 +134,20 @@ public class ActionController {
 	    saveInfo.getBtnOK().addActionListener(e -> DisposeView());             // Schließt das Dialogfenster für Spielinformationen
 
 	    // Dialog für Spiel beenden
-	    exitGame.getBtnExit().addActionListener(e -> ExitGame());              // Beendet das Spiel
-	    exitGame.getBtnNo().addActionListener(e -> DisposeView());             // Schließt das Bestätigungsdialogfenster
+	    //exitGame.getBtnExit().addActionListener(e -> ExitGame());              // Beendet das Spiel
+	    //exitGame.getBtnNo().addActionListener(e -> DisposeView());             // Schließt das Bestätigungsdialogfenster
 
 	    // Dialog für Fehler bei Inseln
-	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());           // Schließt das Dialogfenster für Fehlermeldungen
+	    //errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());           // Schließt das Dialogfenster für Fehlermeldungen
 
 	    // Dialog für abgeschlossenes Spiel
-	    completeGame.getBtnOk().addActionListener(e -> completedGame());       // Schließt das Dialogfenster für abgeschlossene Spiele
+	    //completeGame.getBtnOk().addActionListener(e -> completedGame());       // Schließt das Dialogfenster für abgeschlossene Spiele
 
 	    // Dialog für erfolgreiches Speichern
-	    success.getBtnOk().addActionListener(e -> closeMessage());             // Schließt das Dialogfenster für die Erfolgsmeldung
+	    //success.getBtnOk().addActionListener(e -> closeMessage());             // Schließt das Dialogfenster für die Erfolgsmeldung
 
 	    // Dialog für Bestätigung des Abbruchs beim Speichern
-	    cancelSaveOption.getBtnOk().addActionListener(e -> closeCancelWindow());// Schließt das Dialogfenster zur Bestätigung des Abbruchs
+	    //cancelSaveOption.getBtnOk().addActionListener(e -> closeCancelWindow());// Schließt das Dialogfenster zur Bestätigung des Abbruchs
 
 	    // Puzzle-Einstellungen
 	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle());         // Aktiviert die automatische Größenanpassung
@@ -345,15 +345,18 @@ public class ActionController {
 	    } else {
 	        // Speichert das Spiel mit den aktuellen Parametern und der Liste der Inseln.
 	        save.saveGame(getWidth(), getHeight(), getIslands(), island.getListofIslands(), bridgeC.getListOfBridge());
-
+	        
 	        // Debug-Ausgabe: Anzahl der Brücken
 	        for(CreateBridges bridges : bridgeC.getListOfBridge()) {
 	            System.out.println(bridges.getNumberOfBridges());
 	        }
-
+	        if(save.isCancelSave()) 	
+	        	return;
+	        
 	        // Zeigt ein Dialogfenster an, um den Erfolg des Speicherns zu bestätigen.
-	        success.setLocationRelativeTo(bridges.getDraw());
-	        success.setVisible(true);
+	        JOptionPane.showMessageDialog(bridges.getFrmBridges(), "Die Daten wurden erfolgreich\n gespeichert!", "Speichern Erfolgreich", JOptionPane.INFORMATION_MESSAGE);
+	        //success.setLocationRelativeTo(bridges.getDraw());
+	        //success.setVisible(true);
 	    }
 	}
 
@@ -368,15 +371,15 @@ public class ActionController {
 	 * und schließt es entsprechend.
 	 */
 	private void DisposeView() {
-	    if (exitGame.isVisible()) {
+	    /*if (exitGame.isVisible()) {
 	        exitGame.dispose(); // Schließt das Exit-Dialogfenster
-	    }
+	    }*/
 	    if (puzzle.isVisible()) {
 	        puzzle.dispose(); // Schließt das Puzzle-Dialogfenster
 	    }
-	    if (saveInfo.isVisible()) {
+	    /*if (saveInfo.isVisible()) {
 	        saveInfo.dispose(); // Schließt das Spielinfo-Dialogfenster
-	    }
+	    }*/
 	}
 	
 	/**
@@ -644,37 +647,37 @@ public class ActionController {
 	/**
 	 * Beendet das Spiel und schließt die Anwendung.
 	 */
-	private void ExitGame() {
+	/*private void ExitGame() {
 	    System.exit(0);
-	}
+	}*/
 	
 	/**
 	 * Schließt das Dialogfenster zur Bestätigung des Abbruchs beim Speichern.
 	 */
-	private void closeCancelWindow() {
+	/*private void closeCancelWindow() {
 	    cancelSaveOption.dispose();
-	}
+	}*/
 
 	/**
 	 * Schließt das Dialogfenster für die Erfolgsmeldung nach erfolgreichem Speichern.
 	 */
-	private void closeMessage() {
+	/*private void closeMessage() {
 	    success.dispose();
-	}
+	}*/
 
 	/**
 	 * Behandelt das Abschließen eines Spiels und schließt das entsprechende Dialogfenster.
 	 */
-	private void completedGame() {
+	/*private void completedGame() {
 	    completeGame.dispose();
-	}
+	}*/
 	
     /**
      * Behandelt die Aktion bei einer Fehlermeldung und schließt das entsprechende Dialogfenster.
      */
-    private void ErrorMessage() {
+    /*private void ErrorMessage() {
         errorInfo.dispose();
-    }
+    }*/
     
     
 	/**

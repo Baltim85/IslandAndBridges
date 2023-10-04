@@ -54,6 +54,7 @@ public class NoGame extends JDialog {
 		// Das "OK"-Button erstellen und dem unteren Bereich des Haupt-Panels hinzufügen
 		btnOK = new JButton("OK");
 		btnOK.setFont(new Font("Calibri", Font.PLAIN, 18));
+		btnOK.addActionListener(e -> disposeView());
 		contentPanel.add(btnOK, BorderLayout.SOUTH);
 
 		// Ein Panel für die Nachrichten erstellen und dem mittleren Bereich des Haupt-Panels hinzufügen
@@ -74,6 +75,22 @@ public class NoGame extends JDialog {
 		panel.add(lblNewLabel_1);
 	}
 
+	/**
+	 * Schließt und entsorgt das aktuelle UI-Fenster oder Dialogfeld.
+	 * 
+	 * Diese Methode wird aufgerufen, um das Fenster zu schließen und die damit
+	 * verbundenen Ressourcen freizugeben. Sie wird normalerweise verwendet, wenn der
+	 * Benutzer die Schließtaste des Fensters oder einen ähnlichen Schließmechanismus auslöst.
+	 * 
+	 * @throws WindowClosingException Wenn ein Fehler beim Schließen des Fensters auftritt.
+	 * 
+	 * Hinweis: Diese Methode sollte normalerweise nicht direkt aufgerufen werden,
+	 * sondern durch den Benutzer oder durch eine entsprechende UI-Interaktion ausgelöst werden.
+	 * Das Schließen eines Fensters ist eine wichtige Aktion und sollte mit Bedacht erfolgen.
+	 */
+	private void disposeView() {
+	    this.dispose(); // Aufruf der dispose()-Methode des JDialog, um das Fenster zu schließen.
+	}
 
 	/**
 	 * Gibt die Schaltfläche "OK" zurück.
