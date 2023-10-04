@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import java.awt.event.MouseListener;
-import java.lang.ModuleLayer.Controller;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -150,9 +150,9 @@ public class BridgeController implements MouseListener {
 	    this.height = height;
 
 	    errorInfo = new ErrorIsland();
-	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
+	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
 	    gameCompleted = new FinishedGame();
-	    gameCompleted.getBtnNo().addActionListener(e -> completeGame());
+	    gameCompleted.getBtnOk().addActionListener(e -> completeGame());
 	    
 	    this.centerX = centerX;
 	    this.centerY = centerY;
@@ -183,9 +183,9 @@ public class BridgeController implements MouseListener {
 	    this.height = height;
 
 	    errorInfo = new ErrorIsland();
-	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
+	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());
 	    gameCompleted = new FinishedGame();
-	    gameCompleted.getBtnNo().addActionListener(e -> completeGame());
+	    gameCompleted.getBtnOk().addActionListener(e -> completeGame());
 	    
 	    this.centerX = centerX;
 	    this.centerY = centerY;
@@ -581,6 +581,7 @@ public class BridgeController implements MouseListener {
 	        }
 	        System.out.println(islands.size());
 	        if(islands.size() == islandList.size())
+	        	gameCompleted.setLocationRelativeTo(bridges.getDraw());
 	        	gameCompleted.setVisible(true);
 	    }
 
@@ -611,8 +612,9 @@ public class BridgeController implements MouseListener {
             bridges.getLblInfo().setText("Das Spiel enthält fehler!");
             // Fehler Meldung
             if(!isVisible()) {
+            	errorInfo.setLocationRelativeTo(bridges.getDraw());
             	errorInfo.setVisible(true);
-            	setVisible(true);
+            	//setVisible(true);
         	}
         }
         

@@ -1,11 +1,6 @@
 package Controller;
 
-
-
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Random;
 
 
@@ -16,45 +11,43 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import UI.Bridges;
+import UI.CancelSave;
 import UI.ErrorIsland;
 import UI.ExitDialog;
 import UI.FinishedGame;
 import UI.NewPuzzle;
 import UI.NoGame;
+import UI.SaveGameSuccessfully;
 import Modell.CalculateGrid;
-import Modell.CheckInput;
+
 import Modell.CreateBridges;
 import Modell.GridPainter;
 import Modell.Island;
-
+import Modell.load.GameLoader;
+import Modell.save.SaveGame;
 import SaveLoad.*;
 
 /**
- * Die `ActionController`-Klasse ist die Hauptklasse für die Steuerung der Anwendung,
- * die die Benutzeroberfläche und Spiellogik verknüpft.
+ * Die Klasse GameController ist verantwortlich für die Steuerung der Anwendung.
+ * Sie verwaltet die Hauptkomponenten der Anwendung, darunter das Hauptfenster, Dialogfenster für verschiedene Aktionen
+ * wie Beenden, Puzzle-Erstellung, Speichern und Laden von Spielständen sowie Fehlermeldungen und Erfolgsmeldungen.
  */
 public class ActionController {
-	// Felder zur Speicherung der Hauptkomponenten der Anwendung
-	private Bridges bridges;         // Das Hauptfenster der Anwendung
-	private ExitDialog exitGame;     // Ein Dialogfenster zum Beenden des Spiels
-	private NewPuzzle puzzle;        // Ein Dialogfenster zur Puzzle-Erstellung
-	private NoGame saveInfo;         // Ein Dialogfenster für fehlende Spielinformationen
-	private SaveGame save;           // Eine Klasse zur Speicherung von Spielständen
-	private LoadGame load;           // Eine Klasse zur Verwaltung des Ladens von Spielständen
-	
-	private ErrorIsland errorInfo;
-	private FinishedGame completeGame;
-
-	public ErrorIsland getErrorInfo() {
-		return errorInfo;
-	}
+    private Bridges bridges;             // Das Hauptfenster der Anwendung
+    private ExitDialog exitGame;         // Ein Dialogfenster zum Beenden des Spiels
+    private NewPuzzle puzzle;            // Ein Dialogfenster zur Puzzle-Erstellung
+    private NoGame saveInfo;             // Ein Dialogfenster für fehlende Spielinformationen
+    private SaveGame save;               // Eine Klasse zur Speicherung von Spielständen
+    private LoadGame load;               // Eine Klasse zur Verwaltung des Ladens von Spielständen
+    private ErrorIsland errorInfo;       // Ein Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln
+    private FinishedGame completeGame;   // Ein Dialogfenster zur Anzeige des Spielabschlusses
+    private SaveGameSuccessfully success; // Ein Dialogfenster zur Anzeige des erfolgreichen Speicherns eines Spielstands
+    private CancelSave cancelSaveOption; // Ein Dialogfenster zur Bestätigung der Abbruchoption beim Speichern
 
 
-
-	public void setErrorInfo(ErrorIsland errorInfo) {
-		this.errorInfo = errorInfo;
-	}
-
+    private GameLoader loadGame;
+    
+    
 	// Felder zur Verwaltung von Spielinformationen und Zuständen
 	private int height;              // Die Höhe des Spielfelds
 	private int width;               // Die Breite des Spielfelds
@@ -90,234 +83,284 @@ public class ActionController {
 	// Hier wird eine Konstante für den Standardwert des X-Zentrums definiert.
 	private static final int DEFAULT_CENTER_X = 0; 
 	
-	// Hier wird eine Konstante für den Standardwert des Y-Zentrums definiert.
-	private static final int DEFAULT_CENTER_Y = 0; 
+	
+	//Eine Konstante, die den Standardwert für das Y-Zentrum definiert.
+	private static final int DEFAULT_CENTER_Y = 0;
+
+	
+	// Eine Flagge, die angibt, ob ein Spiel existiert oder nicht.
+	private boolean gameExist = false;
 
     
     
-    /**
-     * Konstruktor für den ActionController. Initialisiert die Dialogfenster und fügt Listener hinzu.
-     *
-     * @param bridges Die Hauptanwendung (Bridges), zu der dieser Controller gehört.
-     */
-    public ActionController(Bridges bridges) {
-        this.bridges = bridges;
-        exitGame = new ExitDialog();
-        errorInfo = new ErrorIsland();
-        puzzle = new NewPuzzle();
-        //checkInput = new CheckInput();
-        bridgeC = new BridgeController();
-        save = new SaveGame();
-        saveInfo = new NoGame();
-        completeGame = new FinishedGame();
-        addListener();
-    }
+	/**
+	 * Der ActionController ist verantwortlich für die Steuerung der Anwendung und die Initialisierung der Hauptkomponenten.
+	 * Er erstellt verschiedene Dialogfenster und den BridgeController, weist ihnen die erforderlichen Instanzen zu und fügt
+	 * Event-Listener hinzu, um die Benutzerinteraktionen zu behandeln.
+	 *
+	 * @param bridges Die Hauptanwendungsklasse, die die Benutzeroberfläche darstellt.
+	 */
+	public ActionController(Bridges bridges) {
+	    this.bridges = bridges;
+	    exitGame = new ExitDialog();             // Initialisieren des Dialogfensters zum Beenden des Spiels
+	    errorInfo = new ErrorIsland();           // Initialisieren des Dialogfensters für Fehlermeldungen im Zusammenhang mit Inseln
+	    puzzle = new NewPuzzle();                // Initialisieren des Dialogfensters zur Puzzle-Erstellung
+	    bridgeC = new BridgeController();        // Initialisieren des BridgeControllers
+	    save = new SaveGame();                   // Initialisieren der Klasse zur Speicherung von Spielständen
+	    saveInfo = new NoGame();                 // Initialisieren des Dialogfensters für fehlende Spielinformationen
+	    completeGame = new FinishedGame();       // Initialisieren des Dialogfensters zur Anzeige des Spielabschlusses
+	    success = new SaveGameSuccessfully();    // Initialisieren des Dialogfensters zur Anzeige des erfolgreichen Speicherns eines Spielstands
+	    cancelSaveOption = new CancelSave();     // Initialisieren des Dialogfensters zur Bestätigung der Abbruchoption beim Speichern
+	    addListener();                           // Hinzufügen von Event-Listenern für die Benutzerinteraktionen
+	}
+
+	
 	
 	
 	
 	/**
-	 * Fügt ActionListeners zu verschiedenen UI-Elementen hinzu.
+	 * Fügt Event-Listener zu den verschiedenen UI-Komponenten hinzu, um auf Benutzerinteraktionen zu reagieren.
+	 * Die Aktionen sind nach Menüaktionen, Dialogfenstern und Puzzle-Einstellungen sortiert.
 	 */
 	public void addListener() {
 	    // Menüaktionen
-	    bridges.getMiNewPuzzle().addActionListener(e -> PuzzleView()); // Öffnet ein neues Rätselansichtsfenster
-	    bridges.getMiQuit().addActionListener(e -> ExitView()); // Öffnet ein Bestätigungsdialogfenster zum Beenden
-	    bridges.getMiSavePuzzle().addActionListener(e -> SaveGame()); // Speichert das aktuelle Spiel
-	    bridges.getMiLoadPuzzle().addActionListener(e -> loadGame()); // Lädt ein gespeichertes Spiel
-	    bridges.getMiRestartPuzzle().addActionListener(e -> restartPuzzle());
+	    bridges.getMiNewPuzzle().addActionListener(e -> PuzzleView());        // Öffnet ein neues Rätselansichtsfenster
+	    bridges.getMiQuit().addActionListener(e -> ExitView());               // Öffnet ein Bestätigungsdialogfenster zum Beenden
+	    bridges.getMiSavePuzzle().addActionListener(e -> SaveGame());          // Speichert das aktuelle Spiel
+	    bridges.getMiLoadPuzzle().addActionListener(e -> loadGame());          // Lädt ein gespeichertes Spiel
+	    bridges.getMiRestartPuzzle().addActionListener(e -> restartPuzzle());  // Startet das aktuelle Puzzle neu
 
 	    // Dialog für Spielinformationen
-	    saveInfo.getBtnOK().addActionListener(e -> DisposeView()); // Schließt das Dialogfenster für Spielinformationen
+	    saveInfo.getBtnOK().addActionListener(e -> DisposeView());             // Schließt das Dialogfenster für Spielinformationen
 
 	    // Dialog für Spiel beenden
-	    exitGame.getBtnExit().addActionListener(e -> ExitGame()); // Beendet das Spiel
-	    exitGame.getBtnNo().addActionListener(e -> DisposeView()); // Schließt das Bestätigungsdialogfenster
+	    exitGame.getBtnExit().addActionListener(e -> ExitGame());              // Beendet das Spiel
+	    exitGame.getBtnNo().addActionListener(e -> DisposeView());             // Schließt das Bestätigungsdialogfenster
 
-	    errorInfo.getBtnNo().addActionListener(e -> ErrorMessage());
-	    
-	    completeGame.getBtnNo().addActionListener(e -> completedGame());
-	    
-	    
+	    // Dialog für Fehler bei Inseln
+	    errorInfo.getBtnOk().addActionListener(e -> ErrorMessage());           // Schließt das Dialogfenster für Fehlermeldungen
+
+	    // Dialog für abgeschlossenes Spiel
+	    completeGame.getBtnOk().addActionListener(e -> completedGame());       // Schließt das Dialogfenster für abgeschlossene Spiele
+
+	    // Dialog für erfolgreiches Speichern
+	    success.getBtnOk().addActionListener(e -> closeMessage());             // Schließt das Dialogfenster für die Erfolgsmeldung
+
+	    // Dialog für Bestätigung des Abbruchs beim Speichern
+	    cancelSaveOption.getBtnOk().addActionListener(e -> closeCancelWindow());// Schließt das Dialogfenster zur Bestätigung des Abbruchs
+
 	    // Puzzle-Einstellungen
-	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die automatische Größenanpassung
-	    puzzle.getRbnSizeIsland().addActionListener(e -> Toggle()); // Aktiviert die manuelle Größeneinstellung
-	    puzzle.getCbDefineIslands().addActionListener(e -> ToggleIslands()); // Aktiviert die Einstellung der Inselanzahl
-	    puzzle.getBtnOk().addActionListener(e -> checkInput()); // Überprüft die Benutzereingabe
-	    puzzle.getBtnAbord().addActionListener(e -> DisposeView()); // Schließt das Einstellungsfenster
+	    puzzle.getRbnAutoSizeIsland().addActionListener(e -> Toggle());         // Aktiviert die automatische Größenanpassung
+	    puzzle.getRbnSizeIsland().addActionListener(e -> Toggle());             // Aktiviert die manuelle Größeneinstellung
+	    puzzle.getCbDefineIslands().addActionListener(e -> ToggleIslands());    // Aktiviert die Einstellung der Inselanzahl
+	    puzzle.getBtnOk().addActionListener(e -> checkInput());                // Überprüft die Benutzereingabe
+	    puzzle.getBtnAbord().addActionListener(e -> DisposeView());             // Schließt das Einstellungsfenster
 	}
 	
-	private void completedGame() {
-		// TODO Auto-generated method stub
-		System.out.println("Game Win");
-		completeGame.dispose();
-	}
-
-
-
+	
+	/**
+	 * Startet das Puzzle neu, indem es den aktuellen Zustand löscht und zur ursprünglichen Konfiguration zurückkehrt.
+	 */
 	private void restartPuzzle() {
-		System.out.println("Restat");
-		
-		if(!isGameExist()) {
-			return;
-		} else {
-			bridgeC.clearLists();
-			createDeepCopy();
-			   
-			   for (Island island : island.getListofIslands()) {
-				    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
-				    deepCopy.add(islandCopy);
-				}
-			grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
-		    clearAndAddGrid();
-	
-		    int delta = 0;
-		    if(gridValues.getXDistance() < gridValues.getYDistance())
-		    	delta = gridValues.getXDistance();
-		    else
-		    	delta = gridValues.getYDistance();
-		    
-		    bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height, grid);
-			//return null;
-		}
+	    // Überprüfen, ob ein Spiel existiert
+	    if (!isGameExist()) {
+	        return; // Kein Neustart, wenn kein Spiel existiert
+	    } else {
+	        // Listen in der BridgeController-Klasse leeren
+	        bridgeC.clearLists();
+	        
+	        // Erstellt eine tiefe Kopie des Spielfelds
+	        createDeepCopy();
+
+	        // Erstellt ein neues GridPainter-Objekt und fügt es hinzu
+	        grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
+	        clearAndAddGrid();
+
+	        // Berechnet den Delta-Wert für die Brückenberechnung
+	        int delta = 0;
+	        if (gridValues.getXDistance() < gridValues.getYDistance()) {
+	            delta = gridValues.getXDistance();
+	        } else {
+	            delta = gridValues.getYDistance();
+	        }
+
+	        // Initialisiert den BridgeController mit der tiefen Kopie und anderen Parametern
+	        bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, width, height, grid);
+	    }
 	}
-
-	private void createDeepCopy() {
-		deepCopy.clear();
-		   
-		for (Island island : island.getListofIslands()) {
-			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
-			    deepCopy.add(islandCopy);
-		}
-	}
-	
-	private boolean gameExist = false;
-
-	public boolean isGameExist() {
-		return gameExist;
-	}
-
-
-
-	public void setGameExist(boolean gameExist) {
-		this.gameExist = gameExist;
-	}
-
-
-
-	private void ErrorMessage() {
-		errorInfo.dispose();
-		
-	}
-
 
 
 	/**
-	 * Lädt ein gespeichertes Spiel und initialisiert die erforderlichen Komponenten.
+	 * Lädt ein gespeichertes Spiel und stellt es wieder her.
 	 */
 	private void loadGame() {
-	    // Laden der Spielinformationen aus der LoadGame-Klasse
-	    load = new LoadGame();
+		loadGame = new GameLoader();
+		loadGame.loadGame();
+		
+		if(loadGame == null) {
+			return;
+		}
+		
+		gridValues = new CalculateGrid(bridges.getDraw().getWidth(), bridges.getDraw().getHeight(), loadGame.getWidth(), loadGame.getHeight());
+		ArrayList<Island> islandsA = new ArrayList<Island>();
+	    insertIslandsIntoList(islandsA);
 	    
-	    // Berechnung der Gitterwerte basierend auf den Spielinformationen
+	    // Liste von Brücken erstellen, indem die Informationen aus der Datei verarbeitet werden
+	    ArrayList<CreateBridges> bridgesList = new ArrayList<CreateBridges>();
+	    insertBridgesIntoList(bridgesList, islandsA);
+	    
+	    // Raster mit den geladenen Informationen erstellen
+	    grid = new GridPainter(loadGame.getWidth(), loadGame.getHeight(), gridValues.getXDistance(), gridValues.getYDistance(),  islandsA);
+
+	    // Inseln in der 'island'-Instanz aktualisieren
+	    island.setListofIslands(islandsA);
+	    createDeepCopy();
+	    
+	    int delta = 0;
+	    if(gridValues.getXDistance() < gridValues.getYDistance())
+	        delta = gridValues.getXDistance();
+	    else
+	        delta = gridValues.getYDistance();
+	    
+	    // BridgeController initialisieren
+	    bridgeC.initController(deepCopy, bridgesList, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, loadGame.getWidth(), loadGame.getHeight(), grid);
+	    
+	    // Spielfeldbreite, Spielfeldhöhe und Anzahl der Inseln setzen
+	    setWidth(loadGame.getWidth());
+	    setHeight(loadGame.getHeight());
+	    setIslands(loadGame.getIslands());
+	    
+	    // Wenn der Controller nicht existiert, MouseListener registrieren
+	    if (!controllerExist) {
+	        registerMouseListener();
+	    }
+	    
+	    // Das Spiel ist jetzt aktiv
+	    setGameExist(true);
+	    
+	    // Alte Zeichenfläche entfernen und neues Raster hinzufügen
+	    clearAndAddGrid();
+		
+		
+	    // Instanz der 'LoadGame'-Klasse erstellen
+	    /*load = new LoadGame();
+	    if(load.isAbordLoad())
+	    	return;
+	    
+	    // Gitterwerte basierend auf den Spielinformationen berechnen
 	    gridValues = new CalculateGrid(bridges.getDraw().getWidth(), bridges.getDraw().getHeight(), load.getWidth(), load.getHeight());
 
-	    // Erstellen einer Liste von Inseln durch Verarbeitung der Informationen aus der Datei
+	    // Liste von Inseln erstellen, indem die Informationen aus der Datei verarbeitet werden
 	    ArrayList<Island> islandsA = new ArrayList<Island>();
+	    insertIslandsIntoList(islandsA);
+
+	    // Liste von Brücken erstellen, indem die Informationen aus der Datei verarbeitet werden
+	    ArrayList<CreateBridges> bridgesList = new ArrayList<CreateBridges>();
+	    insertBridgesIntoList(bridgesList, islandsA);
 	    
-	    for (int[] islandInfo : load.getIslandsList()) {
+	    // Raster mit den geladenen Informationen erstellen
+	    grid = new GridPainter(load.getWidth(), load.getHeight(), gridValues.getXDistance(), gridValues.getYDistance(),  islandsA);
+
+	    // Inseln in der 'island'-Instanz aktualisieren
+	    island.setListofIslands(islandsA);
+	    createDeepCopy();
+	    
+	    int delta = 0;
+	    if(gridValues.getXDistance() < gridValues.getYDistance())
+	        delta = gridValues.getXDistance();
+	    else
+	        delta = gridValues.getYDistance();
+	    
+	    // BridgeController initialisieren
+	    bridgeC.initController(deepCopy, bridgesList, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, load.getWidth(), load.getHeight(), grid);
+	    
+	    // Spielfeldbreite, Spielfeldhöhe und Anzahl der Inseln setzen
+	    setWidth(load.getWidth());
+	    setHeight(load.getHeight());
+	    setIslands(load.getIslands());
+	    
+	    // Wenn der Controller nicht existiert, MouseListener registrieren
+	    if (!controllerExist) {
+	        registerMouseListener();
+	    }
+	    
+	    // Das Spiel ist jetzt aktiv
+	    setGameExist(true);
+	    
+	    // Alte Zeichenfläche entfernen und neues Raster hinzufügen
+	    clearAndAddGrid();  */
+	}
+
+	
+	/**
+	 * Fügt Inseln in eine Liste ein, basierend auf den Informationen aus 'LoadGame'.
+	 *
+	 * @param islandsA Die Liste, in die die Inseln eingefügt werden.
+	 */
+	private void insertIslandsIntoList(ArrayList<Island> islandsA) {
+	    for (int[] islandInfo : loadGame.getIslandsList()) {
 	        int x = islandInfo[0];
 	        int y = islandInfo[1];
 	        int bridge = islandInfo[2];
 	        
-	        // Eine Insel erstellen und zur Liste hinzufügen
+	        // Eine neue Insel erstellen und zur Liste hinzufügen
 	        island = new Island(x, y, islandsA.size(), bridge);
 	        islandsA.add(island);
 	    }
-	    ArrayList<CreateBridges> bridgesList = new ArrayList<CreateBridges>();
-	    for(int [] bridgeInfo : load.getBridgeList()) {
-	    	int firstID = bridgeInfo[0];
-	    	int secondID = bridgeInfo[1];
-	    	int numberBridges = bridgeInfo[2];
-	    	
-	    	int firstX = islandsA.get(firstID).getX();
-	    	int firstY = islandsA.get(firstID).getY();
-	    	int secondX = islandsA.get(secondID).getX();
-	    	int secondY = islandsA.get(secondID).getY();
-	    	bridgesList.add(new CreateBridges(firstID, firstX, firstY, secondID, secondX, secondY, numberBridges, null));
-	    }
-	    
-	    
-	    // Erstellen des Rasters mit den geladenen Informationen
-	    grid = new GridPainter(load.getWidth(), load.getHeight(), gridValues.getXDistance(), gridValues.getYDistance(),  islandsA);
-
-	    deepCopy.clear();
-		   
-		for (Island island : islandsA) {
-			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
-			    deepCopy.add(islandCopy);
-		}
-	    //createDeepCopy();
-	    island.setListofIslands(islandsA);
-	    int delta = 0;
-	    if(gridValues.getXDistance() < gridValues.getYDistance())
-	    	delta = gridValues.getXDistance();
-	    else
-	    	delta = gridValues.getYDistance();
-	    
-	    //bridgeC.initController(deepCopy, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, load.getWidth(), load.getHeight(), grid);
-	    bridgeC.initController(deepCopy, bridgesList, bridges, gridValues.getXDistance(), gridValues.getYDistance(), delta, load.getWidth(), load.getHeight(), grid);
-	    setWidth(load.getWidth());
-	    setHeight(load.getHeight());
-	    setIslands(load.getIslands());
-	    if(!controllerExist) {
-	    	registerMouseListener();
-	    }
-	    setGameExist(true);
-	    
-	    // Entfernen der alten Zeichenfläche und Hinzufügen des neuen Rasters
-	    clearAndAddGrid();
-	    
-	    
 	}
-	
+
 	/**
-	 * Speichert das aktuelle Spiel, sofern es vorhanden ist, oder zeigt eine Fehlermeldung an.
+	 * Fügt Brücken in eine Liste ein, basierend auf den Informationen aus 'LoadGame'.
+	 *
+	 * @param bridgesList Die Liste, in die die Brücken eingefügt werden.
+	 * @param islandsA    Die Liste von Inseln, auf die sich die Brücken beziehen.
+	 */
+	private void insertBridgesIntoList(ArrayList<CreateBridges> bridgesList, ArrayList<Island> islandsA) {
+	    for (int[] bridgeInfo : loadGame.getBridgeList()) {
+	        int firstID = bridgeInfo[0];
+	        int secondID = bridgeInfo[1];
+	        int numberBridges = bridgeInfo[2];
+	        
+	        // Die Koordinaten der ersten Insel und der zweiten Insel erhalten
+	        int firstX = islandsA.get(firstID).getX();
+	        int firstY = islandsA.get(firstID).getY();
+	        int secondX = islandsA.get(secondID).getX();
+	        int secondY = islandsA.get(secondID).getY();
+	        
+	        // Eine neue Brücke erstellen und zur Liste hinzufügen
+	        bridgesList.add(new CreateBridges(firstID, firstX, firstY, secondID, secondX, secondY, numberBridges, null));
+	    }		
+	}
+
+	
+
+	/**
+	 * Speichert das aktuelle Spiel.
 	 */
 	private void SaveGame() {
 	    if (deepCopy.isEmpty()) {
 	        // Wenn keine Inseln vorhanden sind, wird ein Fehlerdialog angezeigt.
+	        saveInfo.setLocationRelativeTo(bridges.getDraw());
 	        saveInfo.setVisible(true);
 	    } else {
 	        // Speichert das Spiel mit den aktuellen Parametern und der Liste der Inseln.
 	        save.saveGame(getWidth(), getHeight(), getIslands(), island.getListofIslands(), bridgeC.getListOfBridge());
+
+	        // Debug-Ausgabe: Anzahl der Brücken
 	        for(CreateBridges bridges : bridgeC.getListOfBridge()) {
-	        	System.out.println(bridges.getNumberOfBridges());
+	            System.out.println(bridges.getNumberOfBridges());
 	        }
-	        
+
+	        // Zeigt ein Dialogfenster an, um den Erfolg des Speicherns zu bestätigen.
+	        success.setLocationRelativeTo(bridges.getDraw());
+	        success.setVisible(true);
 	    }
 	}
 
-	/**
-	 * Zeigt das Exit-Dialogfenster an, um das Spiel zu beenden.
-	 */
-	private void ExitView() {
-	    exitGame.setVisible(true);
-	}
+	
 
-	/**
-	 * Zeigt das Puzzle-Dialogfenster an, um Einstellungen für ein neues Rätsel vorzunehmen.
-	 */
-	private void PuzzleView() {
-	    puzzle.setVisible(true);
-	    //listofIslands.clear(); // Diese Zeile ist auskommentiert. Falls notwendig, kann sie verwendet werden.
-	}
 
-	/**
-	 * Beendet das Spiel und schließt die Anwendung.
-	 */
-	private void ExitGame() {
-	    System.exit(0);
-	}
+
 
 	/**
 	 * Schließt das sichtbare Dialogfenster, falls eines davon sichtbar ist.
@@ -511,41 +554,12 @@ public class ActionController {
 	        island.createFirstIsland(islands);
 	    } while (!island.isOk());
 
-	    /*Collections.sort(listofIslands, new Comparator<Island>() {
-            @Override
-            public int compare(Island island1, Island island2) {
-                int compareX = Integer.compare(island1.getX(), island2.getX());
-                if (compareX == 0) {
-                    // Wenn die X-Koordinaten gleich sind, vergleiche nach Y-Koordinaten
-                    return Integer.compare(island1.getY(), island2.getY());
-                }
-                return compareX;
-            }
-        });*/
-	    
-	    /*deepCopy.clear();
-		   
-		   for (Island island : island.getListofIslands()) {
-			    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
-			    deepCopy.add(islandCopy);
-			}*/
 	    createDeepCopy();
 	
 	    // Ein neues Gitter-Objekt erstellen
 	   grid = new GridPainter(width, height, gridValues.getXDistance(), gridValues.getYDistance(), deepCopy);
 	   
-	   //Collections.copy(island.getListofIslands(), deepCopy);
-	    
-	   
-	   /*deepCopy.clear();
-	   
-	   for (Island island : island.getListofIslands()) {
-		    Island islandCopy = new Island(island.getX(), island.getY(), island.getId(),null, island.getBridgeCount(), false, false, false,false,  island.getCenterX(), island.getCenterY());
-		    deepCopy.add(islandCopy);
-		}*/
 
-	  
-	   
 	    // Das Puzzle-Fenster schließen
 	    puzzle.dispose();
 
@@ -605,6 +619,83 @@ public class ActionController {
 	    });
 	}
 	
+	
+	
+	/**
+	 * Erstellt eine tiefe Kopie der Inseln und fügt sie zur 'deepCopy'-Liste hinzu.
+	 */
+	private void createDeepCopy() {
+	    // Vorhandene Elemente in der 'deepCopy'-Liste löschen
+	    deepCopy.clear();
+
+	    // Durchlaufe alle Inseln in der 'listofIslands'-Liste
+	    for (Island island : island.getListofIslands()) {
+	        // Erstelle eine Kopie der Insel mit denselben Eigenschaften
+	        Island islandCopy = new Island(island.getX(), island.getY(), island.getId(), null, island.getBridgeCount(),
+	                                       false, false, false, false, island.getCenterX(), island.getCenterY());
+	        
+	        // Füge die Inselkopie zur 'deepCopy'-Liste hinzu
+	        deepCopy.add(islandCopy);
+	    }
+	}
+
+	
+	
+	/**
+	 * Beendet das Spiel und schließt die Anwendung.
+	 */
+	private void ExitGame() {
+	    System.exit(0);
+	}
+	
+	/**
+	 * Schließt das Dialogfenster zur Bestätigung des Abbruchs beim Speichern.
+	 */
+	private void closeCancelWindow() {
+	    cancelSaveOption.dispose();
+	}
+
+	/**
+	 * Schließt das Dialogfenster für die Erfolgsmeldung nach erfolgreichem Speichern.
+	 */
+	private void closeMessage() {
+	    success.dispose();
+	}
+
+	/**
+	 * Behandelt das Abschließen eines Spiels und schließt das entsprechende Dialogfenster.
+	 */
+	private void completedGame() {
+	    completeGame.dispose();
+	}
+	
+    /**
+     * Behandelt die Aktion bei einer Fehlermeldung und schließt das entsprechende Dialogfenster.
+     */
+    private void ErrorMessage() {
+        errorInfo.dispose();
+    }
+    
+    
+	/**
+	 * Zeigt das Exit-Dialogfenster an, um das Spiel zu beenden.
+	 */
+	private void ExitView() {
+		exitGame.setLocationRelativeTo(bridges.getDraw());
+	    exitGame.setVisible(true);
+	}
+
+	/**
+	 * Zeigt das Puzzle-Dialogfenster an, um Einstellungen für ein neues Rätsel vorzunehmen.
+	 */
+	private void PuzzleView() {
+		puzzle.setLocationRelativeTo(bridges.getDraw());
+	    puzzle.setVisible(true);
+	    
+	}
+
+	
+	
 	/**
 	 * Gibt die Höhe des Spielfelds zurück.
 	 *
@@ -658,6 +749,45 @@ public class ActionController {
 	public void setIslands(int islands) {
 	    this.islands = islands;
 	}
+	
+    /**
+     * Gibt das Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln zurück.
+     *
+     * @return Das Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln.
+     */
+    public ErrorIsland getErrorInfo() {
+        return errorInfo;
+    }
+
+    /**
+     * Legt das Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln fest.
+     *
+     * @param errorInfo Das Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln.
+     */
+    public void setErrorInfo(ErrorIsland errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+    
+    
+    /**
+     * Überprüft, ob ein Spiel existiert.
+     * 
+     * @return true, wenn ein Spiel existiert, andernfalls false.
+     */
+    public boolean isGameExist() {
+        return gameExist;
+    }
+
+    /**
+     * Setzt den Zustand, ob ein Spiel existiert oder nicht.
+     * 
+     * @param gameExist true, wenn ein Spiel existiert, andernfalls false.
+     */
+    public void setGameExist(boolean gameExist) {
+        this.gameExist = gameExist;
+    }
+
+
 }
 
 

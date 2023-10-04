@@ -13,10 +13,11 @@ import java.awt.Font;
 import java.awt.Color;
 
 /**
- * Die Klasse FinishedGame repräsentiert ein Dialogfenster, das angezeigt wird, wenn das Spiel erfolgreich abgeschlossen wurde.
- * Es zeigt einen Glückwunsch und eine Erfolgsmeldung an und bietet eine Schaltfläche zum Schließen des Dialogs.
+ * Die Klasse CancelSave repräsentiert ein Dialogfenster, das dem Benutzer
+ * anzeigt, dass der Speichervorgang abgebrochen wurde. Der Dialog enthält eine Meldung
+ * und einen OK-Button zum Schließen.
  */
-public class FinishedGame extends JDialog{
+public class CancelSave extends JDialog{
 
 
 	// Eindeutige Serial-Version-ID zur Serialisierung der Klasse.
@@ -29,14 +30,15 @@ public class FinishedGame extends JDialog{
 	private JButton btnOk;
 
 	// Beschriftungen für Aufmerksamkeit und Anfrage.
-	private JLabel lblAttention, lblRequest;
+	private JLabel lblabord;
 
 
 
 	/**
-	 * Konstruktor für das Dialogfenster, das nach erfolgreichem Spielabschluss angezeigt wird.
+	 * Konstruktor für die CancelSave-Klasse. Erzeugt ein Dialogfenster, das dem
+	 * Benutzer anzeigt, dass der Speichervorgang abgebrochen wurde.
 	 */
-	public FinishedGame() {
+	public CancelSave() {
 		// Dialog-Größe und Layout festlegen
 		setBounds(100, 100, 358, 170);
 		getContentPane().setLayout(new BorderLayout());
@@ -52,21 +54,15 @@ public class FinishedGame extends JDialog{
 		btnOk.setBounds(112, 93, 111, 23);
 
 		// Hinweislabel erstellen und positionieren
-		lblAttention = new JLabel("Herzlichen Glückwunsch");
-		lblAttention.setForeground(new Color(9, 125, 2));
-		lblAttention.setFont(new Font("Tahoma", Font.PLAIN, 22));
-		lblAttention.setHorizontalAlignment(SwingConstants.CENTER);
-		lblAttention.setBounds(10, 23, 332, 23);
-
-		// Anforderungslabel erstellen und positionieren
-		lblRequest = new JLabel("Sie haben alle Inseln erfolgreich verbunden");
-		lblRequest.setHorizontalAlignment(SwingConstants.CENTER);
-		lblRequest.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblRequest.setBounds(10, 59, 332, 23);
+		lblabord = new JLabel("Speichern wurde Abgebrochen");
+		lblabord.setVerticalAlignment(SwingConstants.TOP);
+		lblabord.setHorizontalAlignment(SwingConstants.CENTER);
+		lblabord.setForeground(new Color(0, 0, 0));
+		lblabord.setFont(new Font("Tahoma", Font.PLAIN, 22));
+		lblabord.setBounds(10, 23, 332, 32);
 
 		// Komponenten zum Panel hinzufügen
-		contentPanel.add(lblAttention);
-		contentPanel.add(lblRequest);
+		contentPanel.add(lblabord);
 		contentPanel.add(btnOk);
 
 		// Dialog modal machen (blockiert andere Interaktionen)
@@ -80,18 +76,18 @@ public class FinishedGame extends JDialog{
 
 
 	/**
-	 * Gibt die Schaltfläche "Ok" zurück.
-	 * 
-	 * @return die Schaltfläche "Ok"
+	 * Gibt den "OK"-Button des Dialogs zurück.
+	 *
+	 * @return Der "OK"-Button des Dialogs.
 	 */
 	public JButton getBtnOk() {
 		return btnOk;
 	}
 
 	/**
-	 * Setzt die Schaltfläche "Ok".
-	 * 
-	 * @param btnOk die zu setzende Schaltfläche "Ok"
+	 * Legt den "OK"-Button des Dialogs fest.
+	 *
+	 * @param btnOk Der "OK"-Button, der festgelegt werden soll.
 	 */
 	public void setBtnOk(JButton btnOk) {
 		this.btnOk = btnOk;

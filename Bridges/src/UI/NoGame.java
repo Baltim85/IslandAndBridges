@@ -31,57 +31,57 @@ public class NoGame extends JDialog {
 	// Schaltfläche zum Bestätigen (OK) des Dialogs.
 	private JButton btnOK;
 
-    /**
-     * Konstruktor für das NoGame-Dialogfenster.
-     * Initialisiert das Fenster, setzt seinen Typ auf POPUP und erstellt die UI-Elemente.
-     */
+	/**
+	 * Konstruktor für das NoGame-Dialogfenster.
+	 * Initialisiert das Fenster, setzt seinen Typ auf POPUP und erstellt die UI-Elemente.
+	 */
 	public NoGame() {
-	    // Das Fenster nicht veränderbar machen
-	    setResizable(false);
+		// Das Fenster nicht veränderbar machen
+		setResizable(false);
 
-	    // Den Fenstertyp auf POPUP setzen
-	    setType(Type.POPUP);
+		// Den Fenstertyp auf POPUP setzen
+		setType(Type.POPUP);
 
-	    // Die Fenstergröße und Position festlegen
-	    setBounds(100, 100, 450, 190);
+		// Die Fenstergröße und Position festlegen
+		setBounds(100, 100, 450, 190);
 
-	    // Das Haupt-Panel erstellen und dem Fenster hinzufügen
-	    JPanel contentPanel = new JPanel();
-	    contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-	    getContentPane().add(contentPanel, BorderLayout.CENTER);
-	    contentPanel.setLayout(new BorderLayout(0, 0));
+		// Das Haupt-Panel erstellen und dem Fenster hinzufügen
+		JPanel contentPanel = new JPanel();
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new BorderLayout(0, 0));
 
-	    // Das "OK"-Button erstellen und dem unteren Bereich des Haupt-Panels hinzufügen
-	    btnOK = new JButton("OK");
-	    btnOK.setFont(new Font("Calibri", Font.PLAIN, 18));
-	    contentPanel.add(btnOK, BorderLayout.SOUTH);
+		// Das "OK"-Button erstellen und dem unteren Bereich des Haupt-Panels hinzufügen
+		btnOK = new JButton("OK");
+		btnOK.setFont(new Font("Calibri", Font.PLAIN, 18));
+		contentPanel.add(btnOK, BorderLayout.SOUTH);
 
-	    // Ein Panel für die Nachrichten erstellen und dem mittleren Bereich des Haupt-Panels hinzufügen
-	    JPanel panel = new JPanel();
-	    contentPanel.add(panel, BorderLayout.CENTER);
-	    panel.setLayout(new GridLayout(2, 1, 0, 0));
+		// Ein Panel für die Nachrichten erstellen und dem mittleren Bereich des Haupt-Panels hinzufügen
+		JPanel panel = new JPanel();
+		contentPanel.add(panel, BorderLayout.CENTER);
+		panel.setLayout(new GridLayout(2, 1, 0, 0));
 
-	    // Erste Nachricht hinzufügen
-	    JLabel lblNewLabel = new JLabel("Es liegen keine Informationen zum Speichern vor!");
-	    lblNewLabel.setFont(new Font("Calibri", Font.ITALIC, 18));
-	    lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	    panel.add(lblNewLabel);
+		// Erste Nachricht hinzufügen
+		JLabel lblNewLabel = new JLabel("Es liegen keine Informationen zum Speichern vor!");
+		lblNewLabel.setFont(new Font("Calibri", Font.ITALIC, 18));
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(lblNewLabel);
 
-	    // Zweite Nachricht hinzufügen
-	    JLabel lblNewLabel_1 = new JLabel("Bitte starten Sie ein neues Spiel!");
-	    lblNewLabel_1.setFont(new Font("Calibri", Font.ITALIC, 18));
-	    lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
-	    panel.add(lblNewLabel_1);
+		// Zweite Nachricht hinzufügen
+		JLabel lblNewLabel_1 = new JLabel("Bitte starten Sie ein neues Spiel!");
+		lblNewLabel_1.setFont(new Font("Calibri", Font.ITALIC, 18));
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(lblNewLabel_1);
 	}
 
-	
+
 	/**
 	 * Gibt die Schaltfläche "OK" zurück.
 	 * 
 	 * @return Die Schaltfläche "OK".
 	 */
 	public JButton getBtnOK() {
-	    return btnOK;
+		return btnOK;
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class NoGame extends JDialog {
 	 * @param btnOK Die Schaltfläche "OK", die festgelegt werden soll.
 	 */
 	public void setBtnOK(JButton btnOK) {
-	    this.btnOK = btnOK;
+		this.btnOK = btnOK;
 	}
 
 }

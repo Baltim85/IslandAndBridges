@@ -60,8 +60,8 @@ public class Bridges {
 	// Ein Zeichenbereich oder eine Zeichenfläche
 	private JPanel draw;                   // Ein Panel zum Zeichnen des Rätsels oder der Brücken
 
-	
-	
+
+
 	/**
 	 * Launch the application.
 	 */
@@ -83,89 +83,89 @@ public class Bridges {
 	 * Hier wird die Initialisierung der Anwendung durchgeführt und ein ActionController erstellt.
 	 */
 	public Bridges() {
-	    initialize();          // Initialisieren der Anwendung
-	    new ActionController(this);  // Erstellen eines ActionController-Objekts, das die Anwendung steuert
+		initialize();          // Initialisieren der Anwendung
+		new ActionController(this);  // Erstellen eines ActionController-Objekts, das die Anwendung steuert
 	}
 
 	/**
 	 * Initialisiert das Hauptfenster der Anwendung und seine Komponenten.
 	 */
 	private void initialize() {
-	    frmBridges = new JFrame();
-	    frmBridges.setResizable(false);
-	    frmBridges.setTitle("Bridges");
-	    frmBridges.setBounds(100, 100, 1680, 1024);
-	    frmBridges.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	
-	    // Menüleiste
-	    JMenuBar menuBar = new JMenuBar();
-	    frmBridges.setJMenuBar(menuBar);
-	
-	    // Menü "Datei"
-	    JMenu menuFile = new JMenu("Datei");
-	    menuBar.add(menuFile);
-	
-	    // Menüelemente für "Datei"
-	    miNewPuzzle = new JMenuItem("Neues Rätsel");
-	    miRestartPuzzle = new JMenuItem("Rätsel neu Starten");
-	    miSavePuzzle = new JMenuItem("Rätsel Speichern");
-	    miSavePuzzleAs = new JMenuItem("Rätsel Speichern Unter");
-	    miLoadPuzzle = new JMenuItem("Rätsel Laden");
-	    miQuit = new JMenuItem("Beenden");
-	
-	    // Füge Menüelemente zu "Datei" hinzu
-	    menuFile.add(miNewPuzzle);
-	    menuFile.add(miRestartPuzzle);
-	    menuFile.addSeparator();
-	    menuFile.add(miSavePuzzle);
-	    menuFile.add(miSavePuzzleAs);
-	    menuFile.addSeparator();
-	    menuFile.add(miLoadPuzzle);
-	    menuFile.addSeparator();
-	    menuFile.add(miQuit);
-	
-	    // Haupt-Panel
-	    JPanel panel = new JPanel();
-	    panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-	    frmBridges.getContentPane().add(panel, BorderLayout.CENTER);
-	    panel.setLayout(new BorderLayout(0, 0));
-	
-	    // Unteres Panel (South)
-	    JPanel pSouth = new JPanel();
-	    panel.add(pSouth, BorderLayout.SOUTH);
-	    pSouth.setLayout(new GridLayout(3, 1, 3, 5));
-	
-	    // Checkbox
-	    chckbxNewCheckBox = new JCheckBox("Anzahl fehlender Brücken anzeigen");
-	    chckbxNewCheckBox.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    pSouth.add(chckbxNewCheckBox);
-	
-	    // Button-Panel
-	    JPanel pButtons = new JPanel();
-	    pSouth.add(pButtons);
-	    pButtons.setLayout(new GridLayout(1, 2, 100, 0));
-	
-	    // "Automatisch Lösen" Button
-	    btnAutoSolve = new JButton("Automatisch Lösen");
-	    btnAutoSolve.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    pButtons.add(btnAutoSolve);
-	
-	    // "Nächste Brücke" Button
-	    btnNextBridge = new JButton("Nächste Brücke");
-	    btnNextBridge.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    pButtons.add(btnNextBridge);
-	
-	    // Informationslabel
-	    lblInfo = new JLabel("Das Rätsel ist noch nicht gelöst!");
-	    lblInfo.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    pSouth.add(lblInfo);
-	
-	    // Zeichenflächen-Panel
-	    draw = new JPanel();
-	    draw.setBorder(new BevelBorder(BevelBorder.LOWERED));
-	    draw.setBackground(Color.WHITE);
-	    panel.add(draw, BorderLayout.CENTER);
-	    draw.setLayout(new GridLayout(1, 0));
+		frmBridges = new JFrame();
+		frmBridges.setResizable(false);
+		frmBridges.setTitle("Bridges");
+		frmBridges.setBounds(100, 100, 1680, 1024);
+		frmBridges.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// Menüleiste
+		JMenuBar menuBar = new JMenuBar();
+		frmBridges.setJMenuBar(menuBar);
+
+		// Menü "Datei"
+		JMenu menuFile = new JMenu("Datei");
+		menuBar.add(menuFile);
+
+		// Menüelemente für "Datei"
+		miNewPuzzle = new JMenuItem("Neues Rätsel");
+		miRestartPuzzle = new JMenuItem("Rätsel neu Starten");
+		miSavePuzzle = new JMenuItem("Rätsel Speichern");
+		miSavePuzzleAs = new JMenuItem("Rätsel Speichern Unter");
+		miLoadPuzzle = new JMenuItem("Rätsel Laden");
+		miQuit = new JMenuItem("Beenden");
+
+		// Füge Menüelemente zu "Datei" hinzu
+		menuFile.add(miNewPuzzle);
+		menuFile.add(miRestartPuzzle);
+		menuFile.addSeparator();
+		menuFile.add(miSavePuzzle);
+		menuFile.add(miSavePuzzleAs);
+		menuFile.addSeparator();
+		menuFile.add(miLoadPuzzle);
+		menuFile.addSeparator();
+		menuFile.add(miQuit);
+
+		// Haupt-Panel
+		JPanel panel = new JPanel();
+		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		frmBridges.getContentPane().add(panel, BorderLayout.CENTER);
+		panel.setLayout(new BorderLayout(0, 0));
+
+		// Unteres Panel (South)
+		JPanel pSouth = new JPanel();
+		panel.add(pSouth, BorderLayout.SOUTH);
+		pSouth.setLayout(new GridLayout(3, 1, 3, 5));
+
+		// Checkbox
+		chckbxNewCheckBox = new JCheckBox("Anzahl fehlender Brücken anzeigen");
+		chckbxNewCheckBox.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		pSouth.add(chckbxNewCheckBox);
+
+		// Button-Panel
+		JPanel pButtons = new JPanel();
+		pSouth.add(pButtons);
+		pButtons.setLayout(new GridLayout(1, 2, 100, 0));
+
+		// "Automatisch Lösen" Button
+		btnAutoSolve = new JButton("Automatisch Lösen");
+		btnAutoSolve.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		pButtons.add(btnAutoSolve);
+
+		// "Nächste Brücke" Button
+		btnNextBridge = new JButton("Nächste Brücke");
+		btnNextBridge.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		pButtons.add(btnNextBridge);
+
+		// Informationslabel
+		lblInfo = new JLabel("Das Rätsel ist noch nicht gelöst!");
+		lblInfo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		pSouth.add(lblInfo);
+
+		// Zeichenflächen-Panel
+		draw = new JPanel();
+		draw.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		draw.setBackground(Color.WHITE);
+		panel.add(draw, BorderLayout.CENTER);
+		draw.setLayout(new GridLayout(1, 0));
 	}
 
 
@@ -176,7 +176,7 @@ public class Bridges {
 	 * @return Das Hauptfenster der Anwendung.
 	 */
 	public JFrame getFrmBridges() {
-	    return frmBridges;
+		return frmBridges;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class Bridges {
 	 * @param frmBridges Das Hauptfenster der Anwendung, das festgelegt werden soll.
 	 */
 	public void setFrmBridges(JFrame frmBridges) {
-	    this.frmBridges = frmBridges;
+		this.frmBridges = frmBridges;
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class Bridges {
 	 * @return Das Menüelement zum Beenden der Anwendung.
 	 */
 	public JMenuItem getMiQuit() {
-	    return miQuit;
+		return miQuit;
 	}
 
 
@@ -204,7 +204,7 @@ public class Bridges {
 	 * @param miQuit Das Menüelement zum Beenden der Anwendung, das festgelegt werden soll.
 	 */
 	public void setMiQuit(JMenuItem miQuit) {
-	    this.miQuit = miQuit;
+		this.miQuit = miQuit;
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class Bridges {
 	 * @return Das Menüelement für ein neues Puzzle.
 	 */
 	public JMenuItem getMiNewPuzzle() {
-	    return miNewPuzzle;
+		return miNewPuzzle;
 	}
 
 	/**
@@ -222,10 +222,10 @@ public class Bridges {
 	 * @param miNewPuzzle Das Menüelement für ein neues Puzzle, das festgelegt werden soll.
 	 */
 	public void setMiNewPuzzle(JMenuItem miNewPuzzle) {
-	    this.miNewPuzzle = miNewPuzzle;
+		this.miNewPuzzle = miNewPuzzle;
 	}
 
-	
+
 
 	/**
 	 * Gibt das Menüelement für das Neustarten eines Puzzles zurück.
@@ -233,7 +233,7 @@ public class Bridges {
 	 * @return Das Menüelement für das Neustarten eines Puzzles.
 	 */
 	public JMenuItem getMiRestartPuzzle() {
-	    return miRestartPuzzle;
+		return miRestartPuzzle;
 	}
 
 	/**
@@ -242,7 +242,7 @@ public class Bridges {
 	 * @param miRestartPuzzle Das Menüelement für das Neustarten eines Puzzles, das festgelegt werden soll.
 	 */
 	public void setMiRestartPuzzle(JMenuItem miRestartPuzzle) {
-	    this.miRestartPuzzle = miRestartPuzzle;
+		this.miRestartPuzzle = miRestartPuzzle;
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class Bridges {
 	 * @return Das Menüelement für das Speichern eines Puzzles.
 	 */
 	public JMenuItem getMiSavePuzzle() {
-	    return miSavePuzzle;
+		return miSavePuzzle;
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class Bridges {
 	 * @param miSavePuzzle Das Menüelement für das Speichern eines Puzzles, das festgelegt werden soll.
 	 */
 	public void setMiSavePuzzle(JMenuItem miSavePuzzle) {
-	    this.miSavePuzzle = miSavePuzzle;
+		this.miSavePuzzle = miSavePuzzle;
 	}
 
 
@@ -270,7 +270,7 @@ public class Bridges {
 	 * @return Das Menüelement für das Speichern eines Puzzles unter einem anderen Namen.
 	 */
 	public JMenuItem getMiSavePuzzleAs() {
-	    return miSavePuzzleAs;
+		return miSavePuzzleAs;
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class Bridges {
 	 * @param miSavePuzzleAs Das Menüelement für das Speichern eines Puzzles unter einem anderen Namen, das festgelegt werden soll.
 	 */
 	public void setMiSavePuzzleAs(JMenuItem miSavePuzzleAs) {
-	    this.miSavePuzzleAs = miSavePuzzleAs;
+		this.miSavePuzzleAs = miSavePuzzleAs;
 	}
 
 	/**
@@ -288,7 +288,7 @@ public class Bridges {
 	 * @return Das Menüelement für das Laden eines Puzzles.
 	 */
 	public JMenuItem getMiLoadPuzzle() {
-	    return miLoadPuzzle;
+		return miLoadPuzzle;
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class Bridges {
 	 * @param miLoadPuzzle Das Menüelement für das Laden eines Puzzles, das festgelegt werden soll.
 	 */
 	public void setMiLoadPuzzle(JMenuItem miLoadPuzzle) {
-	    this.miLoadPuzzle = miLoadPuzzle;
+		this.miLoadPuzzle = miLoadPuzzle;
 	}
 
 	/**
@@ -306,7 +306,7 @@ public class Bridges {
 	 * @return Das Kontrollkästchen für eine neue Checkbox.
 	 */
 	public JCheckBox getChckbxNewCheckBox() {
-	    return chckbxNewCheckBox;
+		return chckbxNewCheckBox;
 	}
 
 	/**
@@ -315,7 +315,7 @@ public class Bridges {
 	 * @param chckbxNewCheckBox Das Kontrollkästchen für eine neue Checkbox, das festgelegt werden soll.
 	 */
 	public void setChckbxNewCheckBox(JCheckBox chckbxNewCheckBox) {
-	    this.chckbxNewCheckBox = chckbxNewCheckBox;
+		this.chckbxNewCheckBox = chckbxNewCheckBox;
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class Bridges {
 	 * @return Die Schaltfläche "Auto Solve".
 	 */
 	public JButton getBtnAutoSolve() {
-	    return btnAutoSolve;
+		return btnAutoSolve;
 	}
 
 
@@ -334,7 +334,7 @@ public class Bridges {
 	 * @param btnAutoSolve Die Schaltfläche "Auto Solve", die festgelegt werden soll.
 	 */
 	public void setBtnAutoSolve(JButton btnAutoSolve) {
-	    this.btnAutoSolve = btnAutoSolve;
+		this.btnAutoSolve = btnAutoSolve;
 	}
 
 	/**
@@ -343,7 +343,7 @@ public class Bridges {
 	 * @return Die Schaltfläche "Next Bridge".
 	 */
 	public JButton getBtnNextBridge() {
-	    return btnNextBridge;
+		return btnNextBridge;
 	}
 
 	/**
@@ -352,7 +352,7 @@ public class Bridges {
 	 * @param btnNextBridge Die Schaltfläche "Next Bridge", die festgelegt werden soll.
 	 */
 	public void setBtnNextBridge(JButton btnNextBridge) {
-	    this.btnNextBridge = btnNextBridge;
+		this.btnNextBridge = btnNextBridge;
 	}
 
 	/**
@@ -361,7 +361,7 @@ public class Bridges {
 	 * @return Das Label für Informationen.
 	 */
 	public JLabel getLblInfo() {
-	    return lblInfo;
+		return lblInfo;
 	}
 
 	/**
@@ -370,7 +370,7 @@ public class Bridges {
 	 * @param lblInfo Das Label für Informationen, das festgelegt werden soll.
 	 */
 	public void setLblInfo(JLabel lblInfo) {
-	    this.lblInfo = lblInfo;
+		this.lblInfo = lblInfo;
 	}
 
 	/**
@@ -379,7 +379,7 @@ public class Bridges {
 	 * @return Das Zeichenflächen-Panel.
 	 */
 	public JPanel getDraw() {
-	    return draw;
+		return draw;
 	}
 
 	/**
@@ -388,9 +388,9 @@ public class Bridges {
 	 * @param draw Das Zeichenflächen-Panel, das festgelegt werden soll.
 	 */
 	public void setDraw(JPanel draw) {
-	    this.draw = draw;
+		this.draw = draw;
 	}
 
-	
- 
+
+
 }

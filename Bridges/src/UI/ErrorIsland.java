@@ -13,9 +13,8 @@ import java.awt.Font;
 import java.awt.Color;
 
 /**
- * Ein benutzerdefinierter Dialog für die Bestätigung des Spielendes.
- * Diese Klasse erweitert JDialog und stellt einen Dialog dar, der den Benutzer über einen Fehler informiert.
- * Der Dialog enthält eine Meldung und einen OK-Button zum Schließen des Dialogs.
+ * Die Klasse ErrorIsland repräsentiert ein Dialogfenster, das angezeigt wird, wenn ein Fehler im Spiel auftritt.
+ * Es informiert den Benutzer über den Fehler und bietet eine Schaltfläche zum Schließen des Dialogs.
  */
 public class ErrorIsland extends JDialog{
 
@@ -27,7 +26,7 @@ public class ErrorIsland extends JDialog{
 	private final JPanel contentPanel = new JPanel();
 
 	// Schaltflächen zum Abbrechen und Beenden des Dialogs.
-	private JButton btnNo;
+	private JButton btnOk;
 
 	// Beschriftungen für Aufmerksamkeit und Anfrage.
 	private JLabel lblAttention, lblRequest;
@@ -50,9 +49,9 @@ public class ErrorIsland extends JDialog{
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 
-		// "Nein"-Button erstellen und positionieren
-		btnNo = new JButton("OK");
-		btnNo.setBounds(96, 93, 144, 23);
+		// "Ok"-Button erstellen und positionieren
+		btnOk = new JButton("OK");
+		btnOk.setBounds(96, 93, 144, 23);
 
 		// Hinweislabel erstellen und positionieren
 		lblAttention = new JLabel("Achtung!");
@@ -69,7 +68,7 @@ public class ErrorIsland extends JDialog{
 		// Komponenten zum Panel hinzufügen
 		contentPanel.add(lblAttention);
 		contentPanel.add(lblRequest);
-		contentPanel.add(btnNo);
+		contentPanel.add(btnOk);
 
 		// Dialog modal machen (blockiert andere Interaktionen)
 		setModal(true);
@@ -81,21 +80,21 @@ public class ErrorIsland extends JDialog{
 
 
 	/**
-	 * Gibt den "Nein"-Button zurück.
+	 * Gibt den "OK"-Button zurück.
 	 * 
-	 * @return der "Nein"-Button
+	 * @return der "OK"-Button
 	 */
-	public JButton getBtnNo() {
-		return btnNo;
+	public JButton getBtnOk() {
+		return btnOk;
 	}
 
 	/**
-	 * Setzt den "Nein"-Button.
+	 * Setzt den "OK"-Button.
 	 * 
-	 * @param btnNo der zu setzende "Nein"-Button
+	 * @param btnOk der zu setzende "OK"-Button
 	 */
-	public void setBtnNo(JButton btnNo) {
-		this.btnNo = btnNo;
+	public void setBtnOk(JButton btnOk) {
+		this.btnOk = btnOk;
 	}
 
 
