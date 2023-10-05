@@ -10,14 +10,23 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import modells.Painter.Islands.DrawGreenIslands;
+import modells.Painter.Islands.DrawIslands;
+import modells.Painter.Islands.DrawRedIslands;
+import modells.Painter.Islands.IslandFiller;
+
 /**
  * Die GridPainter-Klasse stellt ein Raster dar, auf dem Inseln gezeichnet werden können.
  */
 public class GridPainter extends JPanel{
 
 
-
-
+	private DrawIslands islandDrawer;
+	private DrawGreenIslands greenIslandDrawer;
+	private DrawRedIslands redIslandDrawer;
+	private IslandFiller islandFiller;
+	//private IslandFiller islandFiller = new IslandFiller();
+	
 	/**
 	 * Die serialVersionUID wird für die Serialisierung von Objekten verwendet,
 	 * um die Kompatibilität zwischen serialisierten Objekten und Klassen sicherzustellen.
@@ -110,6 +119,12 @@ public class GridPainter extends JPanel{
 	            arrayIsland[i][j] = false;
 	        }
 	    }
+	    islandFiller = new IslandFiller();
+	    islandDrawer = new DrawIslands(x, y);
+	    greenIslandDrawer = new DrawGreenIslands(x, y);
+	    redIslandDrawer = new DrawRedIslands(x, y);
+	    		
+	    		
 	}
 	
 
@@ -136,10 +151,14 @@ public class GridPainter extends JPanel{
 	    }
 
 	    // Zeichne die Inseln
-	    createIslands(4, g); // Methode zur Erstellung der Inseln aufrufen
+	    //islandDrawer.createIslands(g, islandList);
+	    islandDrawer.drawColoredIsland(g, islandList);
+	    //createIslands(4, g); // Methode zur Erstellung der Inseln aufrufen
 	    paintBridges(g); // Methode zum Zeichnen von Brücken aufrufen
-	    drawGreenIsland(g); // Methode zum Zeichnen grüner Inseln aufrufen
-	    drawRedIsland(g); // Methode zum Zeichnen roter Inseln aufrufen
+	    greenIslandDrawer.drawColoredIsland(g, getDrawGreenBridges());
+	    redIslandDrawer.drawColoredIsland(g, getDrawRedBridges());
+	    //drawGreenIsland(g); // Methode zum Zeichnen grüner Inseln aufrufen
+	    //drawRedIsland(g); // Methode zum Zeichnen roter Inseln aufrufen
 	}
 
 	
@@ -196,27 +215,6 @@ public class GridPainter extends JPanel{
 	        g.drawString(Integer.toString(id), x * islandX - halfX, y * islandY - halfY);
 	        g.drawOval(x * islandX - x, y * islandY - y + (int) ((y - x) / 2), x, x);
 	    } else {
-	    	/*if(islandX == 0 && islandY == 0) {
-	    		g.drawString(Integer.toString(id), x  - (x / 2), y-halfY);
-		        g.drawOval(islandX+(halfX)-halfY, islandY, y, y);
-		        return;
-	    	}
-	    	if(islandX == 0) {
-	    		g.drawString(Integer.toString(id), x - (x / 2),y * islandY + (y / 2) );
-	    		g.drawOval(islandX+(halfX)-halfY, y * islandY , y, y);
-	    		return;
-	    	}
-	    	if(islandY == 0) {
-	    		g.drawString(Integer.toString(id), x * islandX  + (x / 2), y-halfY);
-		        g.drawOval(x * islandX + halfY, islandY, y, y);
-		        return;
-	    	}  else {
-	    		g.drawString(Integer.toString(id), x * islandX  + (x / 2), y * islandY + (y / 2));
-		        g.drawOval(x * islandX + halfY, y * islandY, y, y);
-	    		//g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
-		        //g.drawOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);
-		        return;
-	    	}*/
 	        // Zeichne die Inselnummer und eine ovalförmige Insel
 	        g.drawString(Integer.toString(id), x * islandX - (x / 2), y * islandY - (y / 2));
 	        g.drawOval(x * islandX - (int) (x / 2) - (int) (y / 2), y * islandY - y, y, y);

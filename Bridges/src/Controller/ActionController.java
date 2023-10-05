@@ -11,13 +11,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import UI.Bridges;
-import UI.CancelSave;
 import UI.ErrorIsland;
 import UI.ExitDialog;
-import UI.FinishedGame;
 import UI.NewPuzzle;
 import UI.NoGame;
-import UI.SaveGameSuccessfully;
 import Modell.CalculateGrid;
 
 import Modell.CreateBridges;
@@ -25,7 +22,7 @@ import Modell.GridPainter;
 import Modell.Island;
 import Modell.load.GameLoader;
 import Modell.save.SaveGame;
-import SaveLoad.*;
+
 
 /**
  * Die Klasse GameController ist verantwortlich für die Steuerung der Anwendung.
@@ -38,12 +35,9 @@ public class ActionController {
     private NewPuzzle puzzle;            // Ein Dialogfenster zur Puzzle-Erstellung
     private NoGame saveInfo;             // Ein Dialogfenster für fehlende Spielinformationen
     private SaveGame save;               // Eine Klasse zur Speicherung von Spielständen
-    private LoadGame load;               // Eine Klasse zur Verwaltung des Ladens von Spielständen
+   
     private ErrorIsland errorInfo;       // Ein Dialogfenster für Fehlermeldungen im Zusammenhang mit Inseln
-    private FinishedGame completeGame;   // Ein Dialogfenster zur Anzeige des Spielabschlusses
-    //private SaveGameSuccessfully success; // Ein Dialogfenster zur Anzeige des erfolgreichen Speicherns eines Spielstands
-    //private CancelSave cancelSaveOption; // Ein Dialogfenster zur Bestätigung der Abbruchoption beim Speichern
-
+    
 
     private GameLoader loadGame;
     
@@ -108,9 +102,7 @@ public class ActionController {
 	    bridgeC = new BridgeController();        // Initialisieren des BridgeControllers
 	    save = new SaveGame();                   // Initialisieren der Klasse zur Speicherung von Spielständen
 	    saveInfo = new NoGame();                 // Initialisieren des Dialogfensters für fehlende Spielinformationen
-	    completeGame = new FinishedGame();       // Initialisieren des Dialogfensters zur Anzeige des Spielabschlusses
-	    //success = new SaveGameSuccessfully();    // Initialisieren des Dialogfensters zur Anzeige des erfolgreichen Speicherns eines Spielstands
-	    //cancelSaveOption = new CancelSave();     // Initialisieren des Dialogfensters zur Bestätigung der Abbruchoption beim Speichern
+	   
 	    addListener();                           // Hinzufügen von Event-Listenern für die Benutzerinteraktionen
 	}
 
